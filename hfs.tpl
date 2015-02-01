@@ -14,12 +14,12 @@ option.paged=0
 COMMENT this option causes your file list to be paged by default
 COMMENT skb: no paging!
 
-option.newfolder=1
-option.move=1
-option.comment=0
+option.newfolder=0
+option.move=0
+option.comment=1
 option.rename=1
 COMMENT with these you can disable some features of the template. Please note this is not about user permissions, this is global!
-COMMENT skb: no comments!
+COMMENT skb: no move or folders!
 
 []
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
