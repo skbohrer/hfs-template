@@ -199,7 +199,7 @@ COMMENT skb: no move or folders!
 			if (a.size() != 1) {
 				return alert("You must select a single item to rename");
 			}
-			ezprompt(this.innerHTML, {"type":"text", "default":"fileName"}, function(s){
+			ezprompt(this.innerHTML, {"type":"text", "default":getItemName(a[0])}, function(s){
 				ajax("rename", {from:getItemName(a[0]), to:s});
 		    });'>{.!Rename.}</button>
 		.}
@@ -210,7 +210,7 @@ COMMENT skb: no move or folders!
 			>Multi-Download</button>
 		.}
 		
-		<a href="{.get|url|tpl=list|sort=|{.if not|{.length|{.?search.}.}|{:folders-filter=\|recursive:}.}.}">Get Text Listing</a>
+		<a href="{.get|url|tpl=list|sort=|{.if not|{.length|{.?search.}.}|{:folders-filter=\|recursive:}.}.}">(Text Listing)</a>
 		</center>
 	</fieldset>
 
