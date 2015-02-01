@@ -179,32 +179,34 @@ COMMENT skb: no comments!
 	<fieldset id='actions'>
 		<legend><img src="/~img18"> {.!Actions.}</legend>
 		<center>
-		{.if|{.can mkdir.}|
-		<button id='newfolderBtn' onclick='ezprompt(this.innerHTML, {type:"text"}, function(s){
-				ajax("mkdir", {name:s});
-		    });'>{.!New folder.}</button>
-		.}
-		{.if|{.can comment.}|
-		<button id='commentBtn' onclick='setComment.call(this)'>{.!Comment.}</button>
-		.}
+		
 		{.if|{.get|can delete.}|
-		<button id='deleteBtn' onclick='if (confirm("{.!confirm.}")) submit({action:"delete"})'>{.!Delete.}</button>
-
-		{.if|{.and|{.!option.move.}|{.can move.}.}| <button id='moveBtn' onclick='moveClicked()'>{.!Move.}</button> .}
+			<button id='deleteBtn' onclick='
+				var a = selectedItems();
+				if (a.size() < 1) {
+					return alert("You must select at least one file to delete.");
+				}
+				if (confirm("Delete selected file(s)?")) submit({action:"delete"})'>Delete</button>
 		.}
+		
 		{.if|{.can rename.}|
 		<button id='renameBtn' onclick='
             var a = selectedItems();
-                if (a.size() != 1)
+			if (a.size() != 1) {
 				return alert("You must select a single item to rename");
-			ezprompt(this.innerHTML, {type:"text"}, function(s){
+			}
+			ezprompt(this.innerHTML, {"type":"text", "default":"fileName"}, function(s){
 				ajax("rename", {from:getItemName(a[0]), to:s});
 		    });'>{.!Rename.}</button>
 		.}
+
 		{.if|{.get|can archive.}|
-		<button id='archiveBtn' onclick='if (confirm("{.!confirm.}")) submit({}, "{.get|url|mode=archive|recursive.}")'>{.!Archive.}</button>
+			<button id='archiveBtn' onclick='
+				if (confirm("Download entire folder or selected files as a .tar file?")) submit({}, "{.get|url|mode=archive|recursive.}");'
+			>Multi-Download</button>
 		.}
-		<a href="{.get|url|tpl=list|sort=|{.if not|{.length|{.?search.}.}|{:folders-filter=\|recursive:}.}.}">{.!Get list.}</a>
+		
+		<a href="{.get|url|tpl=list|sort=|{.if not|{.length|{.?search.}.}|{:folders-filter=\|recursive:}.}.}">Get Text Listing</a>
 		</center>
 	</fieldset>
 
@@ -764,7 +766,7 @@ function ezprompt(msg, options, cb) {
                 + ' />';
     }
     $.prompt(msg, {
-        opacity: 0.9,
+        opacity: 0.8,
         overlayspeed: 'fast',
         loaded: function(){  
             $('#jqibox').find(':input').keypress(function (e) {
