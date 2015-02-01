@@ -180,6 +180,10 @@ COMMENT skb: no move or folders!
 		<legend><img src="/~img18"> {.!Actions.}</legend>
 		<center>
 		
+		{.if|{.can comment.}|
+			<button id='commentBtn' onclick='setComment.call(this)'>Comment</button>
+		.}
+		
 		{.if|{.get|can delete.}|
 			<button id='deleteBtn' onclick='
 				var a = selectedItems();
@@ -361,8 +365,6 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 {.inc|ok.}
 <li> <a href="%item-url%">%item-name%</a>
 <br />%item-size% @ %speed% KB/s
-{.if| {.length|%user%.} |{: {.append| %folder-resource%\hfs.comments.txt |{.filename|%item-resource%.}=uploaded by %user%
-/append.} :}/if.}
 
 [upload-failed]
 {.inc|ko.}
