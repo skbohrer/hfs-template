@@ -202,7 +202,7 @@ COMMENT skb: no move or folders!
 
 		{.if|{.get|can archive.}|
 			<button id='archiveBtn' onclick='
-				if (confirm("Download entire folder or selected files as a .tar file?")) submit({}, "{.get|url|mode=archive|recursive.}");'
+				if (confirm("Download selected files, if any; or else the entire folder, as a .tar file?")) submit({}, "{.get|url|mode=archive|recursive.}");'
 			>Multi-Download</button>
 		.}
 		
