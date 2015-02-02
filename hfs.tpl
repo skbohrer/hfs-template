@@ -74,10 +74,6 @@ COMMENT skb: no move or folders!
     {.$box messages.}
     {.$box login.}
     {.$box folder.}
-    {.$box search.}
-    {.$box selection.}
-    {.$box upload.}
-    {.$box actions.}
     {.$box server info.}
 </div>
 
