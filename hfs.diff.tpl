@@ -7,5 +7,4 @@
     {.$box selection.}
     {.$box upload.}
     {.$box actions.}
-    {.$box server info.}
 </div>
