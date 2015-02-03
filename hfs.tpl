@@ -361,11 +361,6 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 {.inc|ok.}
 <li> <a href="%item-url%">%item-name%</a>
 <br />%item-size% @ %speed% KB/s
-{.switch|%item-ext%|,|tar|
-{:
-   .TAR file unpacked!
-:}.}
-
 
 [upload-failed]
 {.inc|ko.}
