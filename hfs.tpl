@@ -120,24 +120,6 @@ COMMENT skb: no move or folders!
 		{.123 if 2| <div id='foldercomment'>|{.commentNL|%folder-item-comment%.}|</div> .}
 	</fieldset>
 
-[box search]	
-	{.if| {.get|can recur.} |
-	<fieldset id='search'>
-		<legend><img src="/~img3"> {.!Search.}</legend>
-		<form style='text-align:center'>
-			<input name='search' size='15' value="{.escape attr|{.?search.}.}">
-			<input type='submit' value="{.!go.}">
-		</form>
-		<div style='margin-top:0.5em;' class='hidden popup'>
-			<fieldset>
-				<legend>{.!Where to search.}</legend>
-					<input type='radio' name='where' value='fromhere' checked='true' />  {.!this folder and sub-folders.}
-					<br><input type='radio' name='where' value='here' />  {.!this folder only.}
-					<br><input type='radio' name='where' value='anywhere' />  {.!entire server.}
-			</fieldset>
-		</div>
-	</fieldset>
-	/if.}
 
 [box selection]	
 	<fieldset id='select' class='onlyscript'>
@@ -202,7 +184,7 @@ COMMENT skb: no move or folders!
 
 		{.if|{.get|can archive.}|
 			<button id='archiveBtn' onclick='
-				if (confirm("Download selected files, if any; or else the entire folder, as a .tar file?")) submit({}, "{.get|url|mode=archive|recursive.}");'
+				if (confirm("Download selected files as a .tar file? (If no selection, entire folder is downloaded)")) submit({}, "{.get|url|mode=archive|recursive.}");'
 			>Multi-Download</button>
 		.}
 		
