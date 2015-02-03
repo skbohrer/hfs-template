@@ -181,6 +181,18 @@ COMMENT skb: no move or folders!
 				ajax("rename", {from:getItemName(a[0]), to:s});
 		    });'>{.!Rename.}</button>
 		.}
+		
+		{.if|{.can rename.}|
+		<button id='setIdBtn' onclick='
+            var a = selectedItems();
+			if (a.size() < 1) {
+				return alert("You must select one or more files to change their IDs");
+			}
+			ezprompt("Specify the new ID for the selected files. (Must be two chars long)", {"type":"text", "default":"00")}, function(s){
+				ajax("rename", {from:getItemName(a[0]), to:s});
+		    });'>Set File IDs</button>
+		.}
+
 
 		{.if|{.get|can archive.}|
 			<button id='archiveBtn' onclick='
