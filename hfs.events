@@ -1,0 +1,7 @@
+[+upload completed]
+{.switch|%item-ext%|,|tar|
+{:
+{.exec|"C:\hfs\7za.exe e -y " "{.vfs to disk|%item-name%.}".}
+:}.}
+
+
