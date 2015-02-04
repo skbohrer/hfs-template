@@ -183,7 +183,7 @@ COMMENT skb: no move or folders!
 		.}
 		
 		{.if|{.can rename.}|
-		<button id='setIdBtn' onclick='
+		<button id='idBtn' onclick='
             var a = selectedItems();
 			if (a.size() < 1) {
 				return alert("You must select one or more files to change their IDs");
@@ -793,9 +793,6 @@ function setComment() {
     });
 }//setComment
 
-
-function changeIDs() {
-}//changeIDs
 
 function selectionMask() {
     ezprompt('{.!Please enter the file mask to select.}', {'type':'text', 'default':'*'}, function(s){
