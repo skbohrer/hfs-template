@@ -1,6 +1,7 @@
-Welcome! This is the default template for HFS 2.3
+Welcome! This was the default template for HFS 2.3
 template revision TR2.
-
+Modifications by Steve Bohrer for Steadman Hill Associates RideCheck software
+ 
 Here below you'll find some options affecting the template.
 Consider 1 is used for "yes", and 0 is used for "no".
 
@@ -183,14 +184,7 @@ COMMENT skb: no move or folders!
 		.}
 		
 		{.if|{.can rename.}|
-		<button id='idBtn' onclick='
-            var a = selectedItems();
-			if (a.size() < 1) {
-				return alert("You must select one or more files to change their IDs");
-			}
-			ezprompt("Specify the new ID for the selected files. (Must be two chars long)", {"type":"text", "default":"00"}, function(s){
-				ajax("rename", {from:getItemName(a[0]), to:s});
-		    });'>Set File IDs</button>
+			<button id='idBtn' onclick='changeIDs.call(this)'>Set File IDs</button>
 		.}
 
 
@@ -785,7 +779,7 @@ function selectedFilesAsStr() {
 function setComment() {
     var sel = selectedItems();
     if (!sel.size())
-        return putMsg("{.!No file selected.}");
+        return alert("You must select a file to add or edit its comment.");
     var def = sel.closest('tr').find('.comment').html() || '';
     ezprompt(this.innerHTML, {type:'textarea', 'default':def}, function(s){
         if (s == def && sel.size() == 1) return true; // there s no work to do
@@ -793,6 +787,15 @@ function setComment() {
     });
 }//setComment
 
+function changeIDs() {
+	var a = selectedItems();
+	if (a.size() < 1) {
+		return alert("You must select one or more files to change their IDs");
+	}
+	ezprompt("Specify the new ID for the selected files. (Must be two chars long)", {"type":"text", "default":"00"}, function(s){
+		ajax("rename", {from:getItemName(a[0]), to:s});
+	});
+}//changeIDs
 
 function selectionMask() {
     ezprompt('{.!Please enter the file mask to select.}', {'type':'text', 'default':'*'}, function(s){
