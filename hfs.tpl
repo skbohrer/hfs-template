@@ -390,16 +390,6 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 	<br><div class='out_bar'><div class='in_bar' style="width:%perc%px"></div></div> %perc%%
 :}.}
 
-[ajax.mkdir|no log]
-{.check session.}
-{.set|x|{.postvar|name.}.}
-{.break|if={.pos|\|var=x.}{.pos|/|var=x.}|result=forbidden.}
-{.break|if={.not|{.can mkdir.}.}|result=not authorized.}
-{.set|x|{.force ansi|%folder%{.^x.}.}.}
-{.break|if={.exists|{.^x.}.}|result=exists.}
-{.break|if={.not|{.length|{.mkdir|{.^x.}.}.}.}|result=failed.}
-{.add to log|User %user% created folder "{.^x.}".}
-ok
 
 [ajax.rename|no log]
 {.check session.}
@@ -414,31 +404,6 @@ ok
 {.add to log|User %user% renamed "{.^x.}" to "{.^y.}".}
 ok
 
-[ajax.move|no log]
-{.check session.}
-{.set|dst|{.force ansi|{.postvar|dst.}.}.}
-{.break|if={.not|{.and|{.can move.}|{.get|can delete.}|{.get|can upload|path={.^dst.}.}/and.}.} |result={.!forbidden.}.}
-{.set|log|{.!Moving items to.} {.^dst.}.}
-{.for each|fn|{.replace|:|{.no pipe||.}|{.force ansi|{.postvar|files.}.}.}|{:
-	{.break|if={.is file protected|var=fn.}|result=forbidden.}
-    {.set|x|{.force ansi|%folder%.}{.^fn.}.}
-    {.set|y|{.^dst.}/{.^fn.}.}
-    {.if not |{.exists|{.^x.}.}|{.^x.}: {.!not found.}|{:
-        {.if|{.exists|{.^y.}.}|{.^y.}: {.!already exists.}|{:
-            {.if|{.length|{.move|{.^x.}|{.^y.}.}.} |{: 
-                {.set|log|{.chr|13.}{.^fn.}|mode=append.}
-                {.move|{.^x.}.md5|{.^y.}.md5.}
-                {.move|{.^x.}.comment|{.^y.}.comment.}
-            :} | {:
-                {.set|log|{.chr|13.}{.^fn.} (failed)|mode=append.}
-                {.maybe utf8|{.^fn.}.}: {.!not moved.}
-            :}/if.}
-        :}/if.}
-    :}.}
-    ;
-:}.}
-{.add to log|{.^log.}.}
-
 [ajax.comment|no log]
 {.check session.}
 {.break|if={.not|{.can comment.}.} |result=forbidden.}
@@ -448,10 +413,6 @@ ok
 :}.}
 ok
 
-[ajax.changepwd|no log]
-{.check session.}
-{.break|if={.not|{.can change pwd.}.} |result=forbidden.}
-{.if|{.length|{.set account||password={.force ansi|{.postvar|new.}.}.}/length.}|ok|failed.}
 
 [special:alias]
 check session=break|if={.{.cookie|HFS_SID.} != {.postvar|token.}.}|result=bad session
@@ -810,14 +771,6 @@ function getStdAjaxCB(what2do) {
     }
 }//getStdAjaxCB
         
-function changePwd() {
-    ezprompt(this.innerHTML, {type:'password'}, function(s){
-        if (s) ajax('changepwd', {'new':s}, getStdAjaxCB([
-            "!{.!Password changed, you'll have to login again..}", 
-            '>~login'
-        ]));
-    });
-}//changePwd
 
 function selectedItems() { return $('#files .selector:checked') }
 
@@ -840,32 +793,9 @@ function setComment() {
     });
 }//setComment
 
-function moveClicked() {
-    ezprompt("{.!Enter the destination folder.}", {type:'text'}, function(s){
-        ajax('move', {dst:s, files:selectedFilesAsStr()}, function(res){
-            var a = res.split(";");
-            if (a.length < 2)
-                return alert($.trim(res));
-            var failed = 0;
-            var ok = 0;
-            var msg = "";
-            for (var i=0; i<a.length-1; i++) {
-                var s = $.trim(a[i]);
-                if (!s.length) {
-                    ok++;
-                    continue;
-                }
-                failed++;
-                msg += s+"\n";
-            }
-            if (failed) 
-                msg = "{.!We met the following problems:.}\n"+msg;
-            msg = (ok ? ok+" {.!files were moved..}\n" : "{.!No file was moved..}\n")+msg;
-            alert(msg);
-            if (ok) location = location; // reload
-        });
-    });
-}//moveClicked
+
+function changeIDs() {
+}//changeIDs
 
 function selectionMask() {
     ezprompt('{.!Please enter the file mask to select.}', {'type':'text', 'default':'*'}, function(s){
