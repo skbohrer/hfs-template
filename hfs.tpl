@@ -188,7 +188,7 @@ COMMENT skb: no move or folders!
 			if (a.size() < 1) {
 				return alert("You must select one or more files to change their IDs");
 			}
-			ezprompt("Specify the new ID for the selected files. (Must be two chars long)", {"type":"text", "default":"00")}, function(s){
+			ezprompt("Specify the new ID for the selected files. (Must be two chars long)", {"type":"text", "default":"00"}, function(s){
 				ajax("rename", {from:getItemName(a[0]), to:s});
 		    });'>Set File IDs</button>
 		.}
