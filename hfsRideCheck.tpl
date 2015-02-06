@@ -91,9 +91,6 @@ COMMENT skb: no move or folders!
 		<center>
 		{.if| {.length|%user%.} |{:
             %user%
-            {.if|{.can change pwd.} | 
-                <button onclick='changePwd.call(this)' style='font-size:x-small;'>{.!Change password.}</button>
-            .}
             :}
             | <a href="~login">Login</a>
         .}
