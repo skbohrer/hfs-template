@@ -166,7 +166,7 @@ COMMENT skb: no move or folders!
 				if (a.size() < 1) {
 					return alert("You must select at least one file to delete.");
 				}
-				if (confirm("Delete selected file(s)?")) submit({action:"delete"})'>Delete</button>
+				if (confirm("Delete selected file(s)?")) submit({action:"delete"}, "{.get|url.}")'>Delete</button>
 		.}
 		
 		{.if|{.can rename.}|
