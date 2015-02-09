@@ -30,7 +30,7 @@ COMMENT skb: no move or folders!
 	<title>{.!HFS.} %folder%</title>
 	<link rel="stylesheet" href="/?mode=section&id=style.css" type="text/css">
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
-    <script> if (typeof jQuery == "undefined") document.write('<script type="text/javascript" src="/?mode=jquery"></'+'script>'); </script>
+    <script> if (typeof jQuery == "undefined") document.write('<script type="text/javascript" src="/?mode=jquery"><'+'/script>'); </script>
 	<link rel="shortcut icon" href="/favicon.ico">
 	<style class='trash-me'>
 	.onlyscript, button[onclick] { display:none; }
@@ -60,10 +60,10 @@ COMMENT skb: no move or folders!
             {.set|sortlink| {:<a href="{.trim|
                     {.get|url|sort=$1| {.if| {.{.?sort.} = $1.} |  rev={.not|{.?rev.} .} /if.} /get.}
                 /trim.}">{.!$2.}{.if| {.{.?sort.} = $1.} | &{.if|{.?rev.}|u|d.}arr;.}</a>:} .}
-            <th>{.^sortlink|n|Name.}{.^sortlink|e|.extension.}
-            <th>{.^sortlink|s|Size.}
-            <th>{.^sortlink|t|Timestamp.}
-            <th>{.^sortlink|d|Hits.}
+            <th>{.^sortlink|n|Name.}</th>
+            <th>{.^sortlink|s|Size.}</th>
+            <th>{.^sortlink|t|Timestamp.}</th>
+            <th>{.^sortlink|d|Hits.}</th>
             %list%
             </table>
         </form>
@@ -125,7 +125,7 @@ COMMENT skb: no move or folders!
 		<center>
     	<button onclick="
             var x = $('#files .selector');
-            if (x.size() > x.filter(':checked').size())
+            if (x.length > x.filter(':checked').length)
                 x.attr('checked', true).closest('tr').addClass('selected');
 			else
                 x.attr('checked', false).closest('tr').removeClass('selected');
@@ -155,6 +155,12 @@ COMMENT skb: no move or folders!
 	<fieldset id='actions'>
 		<legend><img src="/~img18"> {.!Actions.}</legend>
 		<center>
+		{.if|{.can rename.}|
+			<button id='chgIdBtn' onclick='changeIDs.call(this)'>Change IDs</button>
+			<button id='markRunBtn' onclick='markShiftRun.call(this)'>Mark Complete</button>
+			<button id='markUnrunBtn' onclick='markShiftUnrun.call(this)'>Mark Un-run</button>
+			<button id='renameBtn' onclick='doRename.call(this)'>Rename</button>
+		.}
 		
 		{.if|{.can comment.}|
 			<button id='commentBtn' onclick='setComment.call(this)'>Comment</button>
@@ -163,27 +169,14 @@ COMMENT skb: no move or folders!
 		{.if|{.get|can delete.}|
 			<button id='deleteBtn' onclick='
 				var a = selectedItems();
-				if (a.size() < 1) {
+				if (a.length < 1) {
 					return alert("You must select at least one file to delete.");
 				}
 				if (confirm("Delete selected file(s)?")) submit({action:"delete"}, "{.get|url.}")'>Delete</button>
 		.}
 		
 		{.if|{.can rename.}|
-		<button id='renameBtn' onclick='
-            var a = selectedItems();
-			if (a.size() != 1) {
-				return alert("You must select a single item to rename");
-			}
-			ezprompt(this.innerHTML, {"type":"text", "default":getItemName(a[0])}, function(s){
-				ajax("rename", {from:getItemName(a[0]), to:s});
-		    });'>{.!Rename.}</button>
 		.}
-		
-		{.if|{.can rename.}|
-			<button id='idBtn' onclick='changeIDs.call(this)'>Set File IDs</button>
-		.}
-
 
 		{.if|{.get|can archive.}|
 			<button id='archiveBtn' onclick='
@@ -452,7 +445,7 @@ $(function(){
     var fileTpl = x.clone(true).css('display','none');
 
     var x = $('#upload');
-    if  (x.size()) {
+    if  (x.length) {
         // make it popup by button, so we save some vertical space and avoid some scrollbar
         x.hide(); 
         $('#actions button:first').before(
@@ -484,7 +477,7 @@ $(function(){
                 $.get('/?mode=section&id=progress&only=up', function(txt) {
                     if (!txt) return;
                     var x = $('#progress');
-                    if (!x.size()) return clearInterval(updateProgress.handle);
+                    if (!x.length) return clearInterval(updateProgress.handle);
                     if (txt.indexOf('<li>') >= 0) x.html(txt);
                     updateProgress.last = 0;
                 });
@@ -577,13 +570,13 @@ function addPagingButton(where) {
 
 function pageIt(anim) {
     var rows = $('#files tr');
-    if (!rows.size()) return;
+    if (!rows.length) return;
     
     page = 0; // this is global
     var pages = $("<div id='pages'>{.!Page.} </div>").css('visibility','hidden').insertBefore('#files');
     var pageSize = 0;
     while (!outsideV(rows[pageSize], 20))
-        if (++pageSize >= rows.size())
+        if (++pageSize >= rows.length)
             return pages.remove();
     if (pageSize == 0) return; // this happens when the page is not formatted at this exact time, and the table is misplaced 
 
@@ -616,7 +609,7 @@ function pageIt(anim) {
 }//pageIt
 
 function selectedChanged() {
-    $("#selected-number").text( selectedItems().size() ).parent().show();
+    $("#selected-number").text( selectedItems().length ).parent().show();
 } // selectedChanged
 
 function getItemName(el) {
@@ -624,7 +617,7 @@ function getItemName(el) {
         return false;
     // we handle elements, not jquery sets  
     if (el.jquery)
-        if (el.size())
+        if (el.length)
             el = el[0];
         else
             return false;
@@ -663,7 +656,7 @@ function putMsg(txt, time) {
         clearTimeout(lastTimeoutID);
     else
         msgs.find('ul').prepend("<li>"+txt+"</li>");
-    lastTimeoutID = setTimeout("$('#msgs li:last').fadeOut(function(){$(this).detach(); if (!$('#msgs li').size()) $('#msgs').slideUp(); });", time);
+    lastTimeoutID = setTimeout("$('#msgs li:last').fadeOut(function(){$(this).detach(); if (!$('#msgs li').length) $('#msgs').slideUp(); });", time);
 }//putMsg
 
 RegExp.escape = function(text) {
@@ -775,24 +768,48 @@ function selectedFilesAsStr() {
 
 function setComment() {
     var sel = selectedItems();
-    if (!sel.size())
+    if (!sel.length)
         return alert("You must select a file to add or edit its comment.");
     var def = sel.closest('tr').find('.comment').html() || '';
     ezprompt(this.innerHTML, {type:'textarea', 'default':def}, function(s){
-        if (s == def && sel.size() == 1) return true; // there s no work to do
+        if (s == def && sel.length == 1) return true; // there s no work to do
         ajax('comment', {text:s, files:selectedFilesAsStr()});
     });
 }//setComment
 
 function changeIDs() {
 	var a = selectedItems();
-	if (a.size() < 1) {
-		return alert("You must select one or more files to change their IDs");
+	if (a.length < 1) {
+		return alert("You must select one or more Shift files to change their IDs");
 	}
 	ezprompt("Specify the new ID for the selected files. (Must be two chars long)", {"type":"text", "default":"00"}, function(s){
 		ajax("rename", {from:getItemName(a[0]), to:s});
 	});
 }//changeIDs
+
+function markShiftRun() {
+	var a = selectedItems();
+	if (a.length < 1) {
+		return alert("You must select one or more Shift to mark as completed.");
+	}
+}//markShiftRun
+
+function markShiftUnrun() {
+	var a = selectedItems();
+	if (a.length < 1) {
+		return alert("You must select one or more Shift to mark as not run yet.");
+	}
+}// markShiftUnrun
+
+function doRename() {
+	var a = selectedItems();
+	if (a.length != 1) {
+		return alert("You must select a single item to rename");
+	}
+	ezprompt(this.innerHTML, {"type":"text", "default":getItemName(a[0])}, function(s){
+		ajax("rename", {from:getItemName(a[0]), to:s});
+	});
+}//doRename
 
 function selectionMask() {
     ezprompt('{.!Please enter the file mask to select.}', {'type':'text', 'default':'*'}, function(s){
