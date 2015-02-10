@@ -812,25 +812,28 @@ function changeIDs() {
 			return changeShiftName(fileAry, elem, idStr, 5, 2);
 		});
 		if (fileAry.length) {	// some files to rename
+			putMsg('{.!Setting shift ID to "' + idStr + '" on ' + fileAry.length + ' shift files.}');
 			setTimeout(function() {renameMultipleFiles(fileAry);}, 10);
 		}
 	});
 }//changeIDs
 
 var renameMultipleFiles = function(fAry) {
-	var it = {}, getCB;
+	var it = {};
 
-	getCB = function (fileAry) {
+	function getCB (fileAry) {
 		return function(resp) {
 			if (resp && resp.trim() === "ok") {
-				if (fileAry.length > 1) {
+				if (fileAry.length) {
 					setTimeout(function() {renameMultipleFiles(fileAry);}, 10);
-				} else if (fileAry.length === 1) {
-					it = fileAry.shift();
-					ajax("rename", {from:it.oldName, to:it.newName});
+				} else {
+					window.location.reload(true);
+					putMsg("{.!Rename complete.}");
 				}
 			} else {
-				alert("File rename error. Rename cancelled.");
+				alert("File rename error. Target file already exists. Rename cancelled.");
+				putMsg("{.!Rename complete.}");
+				window.location.reload(true);
 			}
 		};
 	};
@@ -845,12 +848,13 @@ function markShiftRun() {
 	// change shift-completed marker at position 7: _ means not run, ~ means run BUS_PID-
 	var a = selectedItems(), fileAry = [];
 	if (a.length < 1) {
-		return alert("You must select one or more Shift to mark as completed.");
+		return alert("You must select one or more Shift to mark as completed. (Completed shifts will not be listed on the tablets by default)");
 	}	
 	a.each(function(index, elem){
 		return changeShiftName(fileAry, elem, "~", 7, 1);
 	});
 	if (fileAry.length) {	// some files to rename
+		putMsg("{.!Setting shift complete flag on " + fileAry.length + " shift files.}");
 		setTimeout(function() {renameMultipleFiles(fileAry);}, 10);
 	}
 }//markShiftRun
@@ -864,6 +868,7 @@ function markShiftUnrun() {
 		return changeShiftName(fileAry, elem, "_", 7, 1);
 	});
 	if (fileAry.length) {	// some files to rename
+		putMsg("{.!Clearing shift complete flag on " + fileAry.length + " shift files.}");
 		setTimeout(function() {renameMultipleFiles(fileAry);}, 10);
 	}	
 }// markShiftUnrun
