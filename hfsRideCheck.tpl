@@ -63,7 +63,6 @@ COMMENT skb: no move or folders!
             <th>{.^sortlink|n|Name.}</th>
             <th>{.^sortlink|s|Size.}</th>
             <th>{.^sortlink|t|Timestamp.}</th>
-            <th>{.^sortlink|d|Hits.}</th>
             %list%
             </table>
         </form>
@@ -157,8 +156,8 @@ COMMENT skb: no move or folders!
 		<center>
 		{.if|{.can rename.}|
 			<button id='chgIdBtn' onclick='changeIDs.call(this)'>Change IDs</button>
-			<button id='markRunBtn' onclick='markShiftRun.call(this)'>Mark Complete</button>
-			<button id='markUnrunBtn' onclick='markShiftUnrun.call(this)'>Mark Un-run</button>
+			<button id='markRunBtn' onclick='markShiftRun.call(this)'>Mark as Run</button>
+			<button id='markUnrunBtn' onclick='markShiftUnrun.call(this)'>Mark as Un-run</button>
 			<button id='renameBtn' onclick='doRename.call(this)'>Rename</button>
 		.}
 		
@@ -175,12 +174,13 @@ COMMENT skb: no move or folders!
 				if (confirm("Delete selected file(s)?")) submit({action:"delete"}, "{.get|url.}")'>Delete</button>
 		.}
 		
-		{.if|{.can rename.}|
-		.}
-
 		{.if|{.get|can archive.}|
 			<button id='archiveBtn' onclick='
-				if (confirm("Download selected files as a .tar file? (If no selection, entire folder is downloaded)")) submit({}, "{.get|url|mode=archive|recursive.}");'
+				var a = selectedItems();
+				if (a.length < 1) {
+					return alert("You must select at least one file to download.");
+				}
+				if (confirm("Download selected files as a .tar file?")) submit({}, "{.get|url|mode=archive.}");'
 			>Multi-Download</button>
 		.}
 		
@@ -252,10 +252,10 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 		{.123 if 2|<div class='comment'>|{.commentNL|%item-comment%.}|</div>.}
 
 [+file]
-<td>%item-size%B<td>%item-modified%<td>%item-dl-count%
+<td>%item-size%B</td><td>%item-modified%</td>
 
 [+folder]
-<td class='nosize'>folder<td>%item-modified%<td>%item-dl-count%
+<td class='nosize'>folder</td><td>%item-modified%</td>
 
 [+link]
 <td class='nosize'>link<td colspan='2'>
@@ -732,11 +732,13 @@ function getStdAjaxCB(what2do) {
         what2do = true;
     return function(res){
         res = $.trim(res);
-        if (res != "ok")
-            return alert("{.!Error.}: "+res);
+        if (res != "ok") {
+			alert("{.!Error.}: "+res);
+            return false;
+		}
         // what2do is a list of actions we are supposed to do if the ajax result is "ok"
         if (typeof what2do == 'undefined') 
-            return;            
+            return true;            
         if (!$.isArray(what2do))
             what2do = [what2do];
         for (var i=0; i<what2do.length; i++) {
@@ -752,6 +754,7 @@ function getStdAjaxCB(what2do) {
                 case 'boolean': if (w) location = location; break;
             }
         }
+		return true;
     }
 }//getStdAjaxCB
         
@@ -777,28 +780,92 @@ function setComment() {
     });
 }//setComment
 
+// replace a substring of the existing filename starting at offs with repStr.
+// then append the part after offs + len. Rename file with the new name
+
+function changeShiftName(fileAry, elem, repStr, offs, len) {
+	var it = {}; 
+	
+	it.oldName = getItemName(elem);
+	it.newName = "";
+	
+	it.newName = it.oldName.slice(0, offs) + repStr;
+	it.newName += it.oldName.slice(offs + len);
+	if (it.newName != it.oldName) {
+		fileAry.push(it);
+	}
+	return true;	// to keep .each() loop running
+}//changeShiftName
+
 function changeIDs() {
 	var a = selectedItems();
 	if (a.length < 1) {
 		return alert("You must select one or more Shift files to change their IDs");
 	}
-	ezprompt("Specify the new ID for the selected files. (Must be two chars long)", {"type":"text", "default":"00"}, function(s){
-		ajax("rename", {from:getItemName(a[0]), to:s});
+	ezprompt("Specify the new ID for the selected files. (Must be two chars long)", {"type":"text", "default":"00"}, function(idStr){
+		var fileAry = [];
+		idStr = idStr.trim().toUpperCase();	// BUS_PID-SHIFT replace id: 2 chars starting at offset 5
+		if (idStr.length !== 2) {
+			return alert("Checker IDs must be two characters long.");
+		}
+		a.each(function(index, elem){
+			return changeShiftName(fileAry, elem, idStr, 5, 2);
+		});
+		if (fileAry.length) {	// some files to rename
+			setTimeout(function() {renameMultipleFiles(fileAry);}, 10);
+		}
 	});
 }//changeIDs
 
+var renameMultipleFiles = function(fAry) {
+	var it = {}, getCB;
+
+	getCB = function (fileAry) {
+		return function(resp) {
+			if (resp && resp.trim() === "ok") {
+				if (fileAry.length > 1) {
+					setTimeout(function() {renameMultipleFiles(fileAry);}, 10);
+				} else if (fileAry.length === 1) {
+					it = fileAry.shift();
+					ajax("rename", {from:it.oldName, to:it.newName});
+				}
+			} else {
+				alert("File rename error. Rename cancelled.");
+			}
+		};
+	};
+	
+	if (fAry.length) {
+		it = fAry.shift();
+		ajax("rename", {from:it.oldName, to:it.newName}, getCB(fAry));
+	}
+};
+
 function markShiftRun() {
-	var a = selectedItems();
+	// change shift-completed marker at position 7: _ means not run, ~ means run BUS_PID-
+	var a = selectedItems(), fileAry = [];
 	if (a.length < 1) {
 		return alert("You must select one or more Shift to mark as completed.");
+	}	
+	a.each(function(index, elem){
+		return changeShiftName(fileAry, elem, "~", 7, 1);
+	});
+	if (fileAry.length) {	// some files to rename
+		setTimeout(function() {renameMultipleFiles(fileAry);}, 10);
 	}
 }//markShiftRun
 
 function markShiftUnrun() {
-	var a = selectedItems();
+	var a = selectedItems(), fileAry = [];
 	if (a.length < 1) {
-		return alert("You must select one or more Shift to mark as not run yet.");
+		return alert("You must select one or more Shift to mark as not yet run. These shifts will be listed on the tablets by default.");
 	}
+	a.each(function(index, elem){
+		return changeShiftName(fileAry, elem, "_", 7, 1);
+	});
+	if (fileAry.length) {	// some files to rename
+		setTimeout(function() {renameMultipleFiles(fileAry);}, 10);
+	}	
 }// markShiftUnrun
 
 function doRename() {
