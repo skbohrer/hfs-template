@@ -1,8 +1,9 @@
 [+upload completed]
 {.if|{.=|%item-ext%|tar|.}|
-{:
-{.exec|C:\hfs\bin\untar.bat {.vfs to disk|%folder%.}.}
-:}.}
+	{:{.exec|C:\hfs\bin\untar.bat {.vfs to disk|%folder%.}.}:}.}
+{.if|{.=|%item-ext%|zip|.}|
+	{:{.exec|C:\hfs\bin\unzip.bat {.vfs to disk|%folder%.}.}:}.}
+
 
 [+on macro rename]
 {.exec|C:\hfs\bin\touch.exe -c {.vfs to disk|%new-name%.}.}
