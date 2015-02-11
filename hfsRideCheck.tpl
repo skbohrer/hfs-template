@@ -117,6 +117,25 @@ COMMENT skb: no move or folders!
 		{.123 if 2| <div id='foldercomment'>|{.commentNL|%folder-item-comment%.}|</div> .}
 	</fieldset>
 
+[box filter]
+	<fieldset id='rcfilter'>
+	<legend>Filter Shifts</legend>
+		<center>
+		<p><div id="ffoo"> Place holder </div></p>
+		<input type="text" id="filtEntry" size ="30" value="?filter=BUS_B00_*">
+		<button onclick='
+			window.location.search = "";
+		'>Clear Filter</button>
+		
+		<button onclick='
+			var newURL, newSearch;
+			newSearch = document.getElementById("filtEntry").value.trim();
+			newURL = window.location.protocol + "//" + window.location.host + window.location.pathname + newSearch;
+			document.getElementById("ffoo").innerHTML = newURL;
+			window.location = newURL;
+		'>Set Filter</button>
+		</center>
+	</fieldset>
 
 [box selection]	
 	<fieldset id='select' class='onlyscript'>
