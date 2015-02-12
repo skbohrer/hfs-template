@@ -119,27 +119,22 @@ COMMENT skb: no move or folders!
 
 [box filter]
 	<fieldset id='rcfilter'>
-	<legend>Filter Shifts</legend>
+	<legend><img src="/~img7"> Filter Shifts </legend>
 		<center>
-		<p><div id="ffoo"> Place holder </div></p>
-		<input type="text" id="filtEntry" size ="30" value="?filter=BUS_B00_*">
-		<button onclick='
-			window.location.search = "";
-		'>Clear Filter</button>
-		
-		<button onclick='
-			var newURL, newSearch;
-			newSearch = document.getElementById("filtEntry").value.trim();
-			newURL = window.location.protocol + "//" + window.location.host + window.location.pathname + newSearch;
-			document.getElementById("ffoo").innerHTML = newURL;
-			window.location = newURL;
-		'>Set Filter</button>
+		Project: <input type="text" id="filtProj" size ="1" maxlength="1" value="?">
+		ID: <input type="text" id="filtId" size ="2" maxlength="2" value="??">
+		Shift: <input type="text" id="filtShift" size ="5" value="*"><br>
+		State: <input type="radio" id="filtRadUnrun" name="filtRadio" value="_">Ready.
+		<input type="radio" id="filtRadRun" name="filtRadio" value="~">Complete.
+		<input type="radio" id="filtRadAll" name="filtRadio" value="?">All.<br><hr>
+		<button onclick='window.location.search = ""'>Clear Filter</button>
+		<button onclick='setShiftFilter.call(this)'>Set Filter</button>
 		</center>
 	</fieldset>
 
 [box selection]	
 	<fieldset id='select' class='onlyscript'>
-		<legend><img src="/~img15"> {.!Select.}</legend>
+		<legend><img src="/~img13"> {.!Select.}</legend>
 		<center>
     	<button onclick="
             var x = $('#files .selector');
@@ -171,13 +166,13 @@ COMMENT skb: no move or folders!
 
 [box actions]	
 	<fieldset id='actions'>
-		<legend><img src="/~img18"> {.!Actions.}</legend>
+		<legend><img src="/~img9"> {.!Actions.}</legend>
 		<center>
 		{.if|{.can rename.}|
 			<button id='chgIdBtn' onclick='changeIDs.call(this)'>Change IDs</button>
-			<button id='markRunBtn' onclick='markShiftRun.call(this)'>Mark as Run</button>
-			<button id='markUnrunBtn' onclick='markShiftUnrun.call(this)'>Mark as Un-run</button>
-			<button id='renameBtn' onclick='doRename.call(this)'>Rename</button>
+			<button id='renameBtn' onclick='doRename.call(this)'>Rename</button><br>
+			<button id='markRunBtn' onclick='markShiftRun.call(this)'>Mark Complete</button>
+			<button id='markUnrunBtn' onclick='markShiftUnrun.call(this)'>Mark Ready</button><br>
 		.}
 		
 		{.if|{.can comment.}|
@@ -192,6 +187,7 @@ COMMENT skb: no move or folders!
 				}
 				if (confirm("Delete selected file(s)?")) submit({action:"delete"}, "{.get|url.}")'>Delete</button>
 		.}
+		<br>
 		
 		{.if|{.get|can archive.}|
 			<button id='archiveBtn' onclick='
@@ -234,8 +230,8 @@ a:hover { background-color:#fff; border-color:#47c; }
 img { border-style:none }
 fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 
-#panel { float:left; margin-top:1em; margin-left:1em; max-width:250px; }
-#panel hr { width:80%; margin:1em auto; }
+#panel { float:left; margin-top:1em; margin-left:1em; max-width:284px; }
+#panel hr { width:85%; margin:1em auto; }
 #files_outer { height:100%; overflow:auto; text-align:left; padding:0 1.6em; }
 #files { background:#ddf; border:0; }
 #files tr { background:#fff; }
@@ -249,7 +245,7 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 #files td:first-child { text-align:left; }
 #files td.nosize { text-align:center; font-style:italic; }
 #files .selector { display:none; }
-#actions button { margin:0.2em; } 
+#actions button { margin:0.2em; width:120px} 
 #breadcrumbs { margin-top:1em; padding-left:0.5em; }
 #breadcrumbs a { padding:0.15em 0; border-width:2px; display:block; }
 #folder-stats, #foldercomment { margin-top:1em; padding-top:0.5em; border-top:1px solid #666;  }
@@ -467,7 +463,7 @@ $(function(){
     if  (x.length) {
         // make it popup by button, so we save some vertical space and avoid some scrollbar
         x.hide(); 
-        $('#actions button:first').before(
+        $('#actions button:last').before(
             $("<button>{.!Upload.}</button>").click(function(){ 
                 $(this).slideUp(); x.fadeIn(); 
             })
@@ -799,6 +795,62 @@ function setComment() {
     });
 }//setComment
 
+function setShiftFilter() {
+	var newSearch = "?filter=BUS_",
+		str = document.getElementById("filtProj").value.trim().toUpperCase();
+	if (!str) {
+		str = "?";
+	}
+	newSearch += str;
+	str = document.getElementById("filtId").value.trim().toUpperCase();
+	if (str.length < 2) {
+		str = "??" + str;
+		str = str.substr(-2, 2);
+	}
+	newSearch += str;
+	newSearch += ( $("input[type='radio'][name='filtRadio']:checked").val() || "?");
+	str = document.getElementById("filtShift").value.trim();
+	if (str.indexOf("*") >= 0 || str.indexOf("?") >= 0) {		// already has a search, so leave it
+		newSearch += str;
+	} else if (str) {	// some text, so add *s
+		newSearch += "*" + str + "*";
+	} else {
+		newSearch += "*";
+	}
+	if (newSearch === "?filter=BUS_????*") {		// Blank filter : show all files!
+		newSearch = "";
+	}
+	window.location.search = newSearch;
+}//setFilter
+
+$( document ).ready(function() {
+	var sstr = window.location.search, tmp;
+	
+	if (sstr) {
+		if ("?filter=" === sstr.substr(0, 8)) {
+			sstr = sstr.substr(8);
+			if ("BUS_" === sstr.substr(0,4)) {
+				sstr = sstr.substr(4);
+				document.getElementById("filtProj").value = sstr.substr(0, 1);
+				document.getElementById("filtId").value = sstr.substr(1, 2);
+				tmp = sstr.substr(3, 1);
+				if (tmp === "_") {
+					tmp = "filtRadUnrun";
+				} else if (tmp === "~") {
+					tmp = "filtRadRun";
+				} else {
+					tmp = "filtRadAll";
+				}
+				document.getElementById(tmp).checked = true;
+				document.getElementById("filtShift").value = sstr.substr(4);
+			} else {
+				document.getElementById("filtShift").value = sstr;
+			}
+		}
+	}
+});
+
+
 // replace a substring of the existing filename starting at offs with repStr.
 // then append the part after offs + len. Rename file with the new name
 
@@ -850,7 +902,7 @@ var renameMultipleFiles = function(fAry) {
 					putMsg("{.!Rename complete.}");
 				}
 			} else {
-				alert("File rename error. Target file already exists. Rename cancelled.");
+				alert("File rename error. Target name exists, or other error. Rename cancelled.");
 				putMsg("{.!Rename complete.}");
 				window.location.reload(true);
 			}
