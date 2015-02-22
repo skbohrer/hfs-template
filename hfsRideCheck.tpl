@@ -261,7 +261,7 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
                              
 [file=folder=link|private]
 	<tr class='{.if|{.mod|{.count|row.}|2.}|even.}'><td>
-		{.if | {.is file | %item-name% .} |
+		{.if | {. 1 .} |
 			{:
 			<label>
 				<input type='checkbox' class='selector' name='selection' value="%item-url%">
