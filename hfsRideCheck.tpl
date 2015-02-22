@@ -1,6 +1,7 @@
 Welcome! This was the default template for HFS 2.3
 template revision TR2.
 Modifications by Steve Bohrer for Steadman Hill Associates RideCheck software
+RideCheck server version 0.9.5 2015-Feb-12
  
 Here below you'll find some options affecting the template.
 Consider 1 is used for "yes", and 0 is used for "no".
@@ -127,8 +128,8 @@ COMMENT skb: no move or folders!
 		State: <input type="radio" id="filtRadUnrun" name="filtRadio" value="_">Ready.
 		<input type="radio" id="filtRadRun" name="filtRadio" value="~">Complete.
 		<input type="radio" id="filtRadAll" name="filtRadio" value="?">All.<br><hr>
-		<button onclick='window.location.search = ""'>Clear Filter</button>
-		<button onclick='setShiftFilter.call(this)'>Set Filter</button>
+		<button onclick='clearShiftFilter()'>Clear Filter</button>
+		<button onclick='setShiftFilter()'>Set Filter</button>
 		</center>
 	</fieldset>
 
@@ -169,10 +170,10 @@ COMMENT skb: no move or folders!
 		<legend><img src="/~img9"> {.!Actions.}</legend>
 		<center>
 		{.if|{.can rename.}|
-			<button id='chgIdBtn' onclick='changeIDs.call(this)'>Change IDs</button>
-			<button id='renameBtn' onclick='doRename.call(this)'>Rename</button><br>
-			<button id='markRunBtn' onclick='markShiftRun.call(this)'>Mark Complete</button>
-			<button id='markUnrunBtn' onclick='markShiftUnrun.call(this)'>Mark Ready</button><br>
+			<button id='chgIdBtn' onclick='changeIDs()'>Change IDs</button>
+			<button id='renameBtn' onclick='doRename()'>Rename</button><br>
+			<button id='markRunBtn' onclick='markShiftRun()'>Mark Complete</button>
+			<button id='markUnrunBtn' onclick='markShiftUnrun()'>Mark Ready</button><br>
 		.}
 		
 		{.if|{.can comment.}|
@@ -256,13 +257,15 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 #pages button { font-size:smaller; }
 .selectedPage { font-weight:bold; font-size:larger; }
 .hidden { display:none; }
+.fltRt {float: right;}
                              
 [file=folder=link|private]
 	<tr class='{.if|{.mod|{.count|row.}|2.}|even.}'><td>
-        <input type='checkbox' class='selector' name='selection' value="%item-url%" {.if not|{.or|{.get|can delete.}|{.get|can access.}|{.get|can archive item.}.}|disabled='disabled'.} />
-		{.if|{.get|is new.}|<span class='flag'>&nbsp;NEW&nbsp;</span>.}
+        <label>
+			<input type='checkbox' class='selector' name='selection' value="%item-url%" {.if not|{.or|{.get|can delete.}|{.get|can access.}|{.get|can archive item.}.}|disabled='disabled'.} />
+		<img src="%item-icon%"> %item-name% </label>	
 		{.if not|{.get|can access.}|<img src='/~img_lock'>.}
-		<a href="%item-url%"><img src="%item-icon%"> %item-name%</a>
+		<a href="%item-url%" class="fltRt">View</a>
 		{.if| {.length|{.?search.}.} |{:{.123 if 2|<div class='item-folder'>{.!item folder.} |{.breadcrumbs|{:<a href="%bread-url%">%bread-name%/</a>:}|from={.count substring|/|%folder%.}/breadcrumbs.}|</div>.}:} .}
 		{.123 if 2|<div class='comment'>|{.commentNL|%item-comment%.}|</div>.}
 
@@ -575,53 +578,6 @@ function ajax(method, data, cb) {
 	return $.post("?mode=section&id=ajax."+method, data, cb||getStdAjaxCB());
 }//ajax
 
-function addPagingButton(where) {
-    $("<button>{.!Paged list.}</button>").insertBefore(where || '#files').click(function(){
-        $(this).remove();
-        pageIt(true);
-        delCookie('paged');
-    });
-}//addPagingButton
-
-function pageIt(anim) {
-    var rows = $('#files tr');
-    if (!rows.length) return;
-    
-    page = 0; // this is global
-    var pages = $("<div id='pages'>{.!Page.} </div>").css('visibility','hidden').insertBefore('#files');
-    var pageSize = 0;
-    while (!outsideV(rows[pageSize], 20))
-        if (++pageSize >= rows.length)
-            return pages.remove();
-    if (pageSize == 0) return; // this happens when the page is not formatted at this exact time, and the table is misplaced 
-
-    Npages = Math.ceil(HFS.number / pageSize);
-    if (Npages == 1)
-        return pages.remove();
-    $('#files').width($('#files').width()); // hold it still
-
-    var s = '';
-    for (var i=1; i <= Npages; i++)
-        s += '<span>'+i+'</span> ';
-    s = $(s);
-    s.appendTo(pages).click(function(){
-        page = Number(this.innerHTML)-1;
-        $('#files tr:gt(0):visible').hide();
-        $('#files tr:gt('+(page*pageSize)+'):lt('+pageSize+')').show();
-        pages.find('span').removeClass('selectedPage').filter(':nth('+page+')').addClass('selectedPage');
-    });
-    s.first().addClass('selectedPage');		
-    $('#files tr:gt('+((page+1)*pageSize)+')').hide();
-    pages.append($("<button type='button'>{.!No pages.}</button>").click(function(){
-        pages.slideUp(function(){ pages.remove(); });
-        $('#files tr:hidden').show();
-        addPagingButton();
-        setCookie('paged', 'no');
-    }));
-    pages.css({visibility:'', display:'none'});
-    if (anim) pages.slideDown()
-    else pages.show();		
-}//pageIt
 
 function selectedChanged() {
     $("#selected-number").text( selectedItems().length ).parent().show();
@@ -795,6 +751,10 @@ function setComment() {
     });
 }//setComment
 
+function clearShiftFilter() {
+	window.location.search = "";
+}
+
 function setShiftFilter() {
 	var newSearch = "?filter=BUS_",
 		str = document.getElementById("filtProj").value.trim().toUpperCase();
@@ -916,10 +876,10 @@ var renameMultipleFiles = function(fAry) {
 };
 
 function markShiftRun() {
-	// change shift-completed marker at position 7: _ means not run, ~ means run BUS_PID-
+	// change shift-completed marker at position 7: _ means not run, ~ means run BUS_PID_
 	var a = selectedItems(), fileAry = [];
 	if (a.length < 1) {
-		return alert("You must select one or more Shift to mark as completed. (Completed shifts will not be listed on the tablets by default)");
+		return alert("You must select one or more Shifts to mark as completed. (Completed shifts will not be listed on the tablets by default)");
 	}	
 	a.each(function(index, elem){
 		return changeShiftName(fileAry, elem, "~", 7, 1);
