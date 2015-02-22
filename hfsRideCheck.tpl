@@ -1,7 +1,7 @@
 Welcome! This was the default template for HFS 2.3
 template revision TR2.
 Modifications by Steve Bohrer for Steadman Hill Associates RideCheck software
-RideCheck server version 0.9.5 2015-Feb-12
+RideCheck server version 0.9.6 2015-Feb-22
  
 Here below you'll find some options affecting the template.
 Consider 1 is used for "yes", and 0 is used for "no".
@@ -261,6 +261,23 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
                              
 [file=folder=link|private]
 	<tr class='{.if|{.mod|{.count|row.}|2.}|even.}'><td>
+		{.if | {.is file | %item% .} |
+			{:
+			<label>
+				<input type='checkbox' class='selector' name='selection' value="%item-url%">
+				<img src="%item-icon%"> %item-name% 
+			</label>
+			{.if not|{.get|can access.}|<img src='/~img_lock'>.}
+			<a href="%item-url%" class="fltRt">View</a>
+			{.123 if 2|<div class='comment'>|{.commentNL|%item-comment%.}|</div>.}
+			:} |
+
+			{:
+				{.if not|{.get|can access.}|<img src='/~img_lock'>.}
+				<a href="%item-url%"><img src="%item-icon%"> %item-name% </a>
+				{.if| {.length|{.?search.}.} |{:{.123 if 2|<div class='item-folder'>{.!item folder.} |{.breadcrumbs|{:<a href="%bread-url%">%bread-name%/</a>:}|from={.count substring|/|%folder%.}/breadcrumbs.}|</div>.}:} .}
+			:}
+		.}
         <label>
 			<input type='checkbox' class='selector' name='selection' value="%item-url%" {.if not|{.or|{.get|can delete.}|{.get|can access.}|{.get|can archive item.}.}|disabled='disabled'.} />
 		<img src="%item-icon%"> %item-name% </label>	
