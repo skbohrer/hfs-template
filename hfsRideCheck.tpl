@@ -261,7 +261,7 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
                              
 [file=folder=link|private]
 	<tr class='{.if|{.mod|{.count|row.}|2.}|even.}'><td>
-		{.if | {.is file | %item-name% .} |
+		{.if | {.is file | %item% .} |
 			{:
 			<label>
 				<input type='checkbox' class='selector' name='selection' value="%item-url%">
@@ -278,13 +278,6 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 				{.if| {.length|{.?search.}.} |{:{.123 if 2|<div class='item-folder'>{.!item folder.} |{.breadcrumbs|{:<a href="%bread-url%">%bread-name%/</a>:}|from={.count substring|/|%folder%.}/breadcrumbs.}|</div>.}:} .}
 			:}
 		.}
-        <label>
-			<input type='checkbox' class='selector' name='selection' value="%item-url%" {.if not|{.or|{.get|can delete.}|{.get|can access.}|{.get|can archive item.}.}|disabled='disabled'.} />
-		<img src="%item-icon%"> %item-name% </label>	
-		{.if not|{.get|can access.}|<img src='/~img_lock'>.}
-		<a href="%item-url%" class="fltRt">View</a>
-		{.if| {.length|{.?search.}.} |{:{.123 if 2|<div class='item-folder'>{.!item folder.} |{.breadcrumbs|{:<a href="%bread-url%">%bread-name%/</a>:}|from={.count substring|/|%folder%.}/breadcrumbs.}|</div>.}:} .}
-		{.123 if 2|<div class='comment'>|{.commentNL|%item-comment%.}|</div>.}
 
 [+file]
 <td>%item-size%B</td><td>%item-modified%</td>
