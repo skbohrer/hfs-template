@@ -1,7 +1,7 @@
 Welcome! This was the default template for HFS 2.3
 template revision TR2.
 Modifications by Steve Bohrer for Steadman Hill Associates RideCheck software
-RideCheck server version 0.9.6 2015-Feb-22
+RideCheck server version 0.9.7 2015-Feb-25
  
 Here below you'll find some options affecting the template.
 Consider 1 is used for "yes", and 0 is used for "no".
@@ -766,7 +766,15 @@ function clearShiftFilter() {
 }
 
 function setShiftFilter() {
-	var newSearch = "?filter=BUS_",
+	var newSearch, fileTag;
+
+	if ("DAT" === window.location.pathname.substr(1, 3)) {
+		fileTag = "DAT_";
+	} else {
+		fileTag = "BUS_";
+	}
+	newSearch = "?filter=" + fileTag;
+	
 		str = document.getElementById("filtProj").value.trim().toUpperCase();
 	if (!str) {
 		str = "?";
@@ -787,8 +795,8 @@ function setShiftFilter() {
 	} else {
 		newSearch += "*";
 	}
-	if (newSearch === "?filter=BUS_????*") {		// Blank filter : show all files!
-		newSearch = "";
+	if (newSearch === "?filter=" + fileTag + "????*") {
+		newSearch = "";		// Blank filter : show all files
 	}
 	window.location.search = newSearch;
 }//setFilter
@@ -799,7 +807,7 @@ $( document ).ready(function() {
 	if (sstr) {
 		if ("?filter=" === sstr.substr(0, 8)) {
 			sstr = sstr.substr(8);
-			if ("BUS_" === sstr.substr(0,4)) {
+			if ("BUS_" === sstr.substr(0,4) || "DAT_" === sstr.substr(0, 4)) {
 				sstr = sstr.substr(4);
 				document.getElementById("filtProj").value = sstr.substr(0, 1);
 				document.getElementById("filtId").value = sstr.substr(1, 2);
