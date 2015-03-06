@@ -1,5 +1,3 @@
-{.add header | Access-Control-Allow-Origin: * .} 
-{.comment | skb: send CORS header .}
 %files%
 
 [files]
