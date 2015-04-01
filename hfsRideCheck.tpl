@@ -1,7 +1,7 @@
 Welcome! This was the default template for HFS 2.3
 template revision TR2.
 Modifications by Steve Bohrer for Steadman Hill Associates RideCheck software
-RideCheck server version 0.9.7 2015-Feb-25
+When editing, change version at RCVersion in special:strings below
  
 Here below you'll find some options affecting the template.
 Consider 1 is used for "yes", and 0 is used for "no".
@@ -12,6 +12,7 @@ put this text [+special:strings]
 and following all the options you want to change, using the same syntax you see here.
 
 [+special:strings]
+RCVersion=RideCheck Server Version 1.0.1
 option.paged=0
 COMMENT this option causes your file list to be paged by default
 COMMENT skb: no paging!
@@ -28,7 +29,7 @@ COMMENT skb: no move or folders!
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title>{.!HFS.} %folder%</title>
+	<title>RideCheck Server %folder%</title>
 	<link rel="stylesheet" href="/?mode=section&id=style.css" type="text/css">
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
     <script> if (typeof jQuery == "undefined") document.write('<script type="text/javascript" src="/?mode=jquery"><'+'/script>'); </script>
@@ -210,6 +211,7 @@ COMMENT skb: no move or folders!
 		<a href="http://www.rejetto.com/hfs/">HttpFileServer %version%</a>
 		<br />{.!Server time.}: %timestamp%
 		<br />{.!Server uptime.}: %uptime%
+		<br />{.!RCVersion.}
 	</fieldset>
 
 
@@ -927,7 +929,7 @@ function doRename() {
 	if (a.length != 1) {
 		return alert("You must select a single item to rename");
 	}
-	ezprompt(this.innerHTML, {"type":"text", "default":getItemName(a[0])}, function(s){
+	ezprompt("Rename shift file:", {"type":"text", "default":getItemName(a[0])}, function(s){
 		ajax("rename", {from:getItemName(a[0]), to:s});
 	});
 }//doRename
