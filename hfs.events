@@ -1,5 +1,5 @@
 [+upload completed]
-{.if|{.%item-size-kb% > 500.}|Sorry, upload size limit is 500 KB.{:{.break.}:}.}
+{.if|{.%item-size-kb% > 500.}|Sorry, upload size limit is 500 KB..}
 {.if|{.=|%item-ext%|tar|.}|
 	{:{.exec|C:\hfs\bin\untar.bat {.vfs to disk|%folder%.}.}:}.}
 {.if|{.=|%item-ext%|zip|.}|
