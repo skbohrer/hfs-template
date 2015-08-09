@@ -2,7 +2,7 @@ Welcome! This was the default template for HFS 2.3
 template revision TR2.
 Modifications by Steve Bohrer for Steadman Hill Associates RideCheck software
 When editing, change version at RCVersion in special:strings below
- 
+
 Here below you'll find some options affecting the template.
 Consider 1 is used for "yes", and 0 is used for "no".
 
@@ -12,7 +12,7 @@ put this text [+special:strings]
 and following all the options you want to change, using the same syntax you see here.
 
 [+special:strings]
-RCVersion=RideCheck Server Version 1.0.1
+RCVersion=RideCheck Server Version 1.1
 option.paged=0
 COMMENT this option causes your file list to be paged by default
 COMMENT skb: no paging!
@@ -31,18 +31,18 @@ COMMENT skb: no move or folders!
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title>RideCheck Server %folder%</title>
 	<link rel="stylesheet" href="/?mode=section&id=style.css" type="text/css">
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
-    <script> if (typeof jQuery == "undefined") document.write('<script type="text/javascript" src="/?mode=jquery"><'+'/script>'); </script>
+    <script type="text/javascript" src="/?mode=jquery"></script>
 	<link rel="shortcut icon" href="/favicon.ico">
 	<style class='trash-me'>
 	.onlyscript, button[onclick] { display:none; }
 	</style>
     <script>
     // this object will store some %symbols% in the javascript space, so that libs can read them
-    HFS = { folder:'{.js encode|%folder%.}', number:%number%, paged:{.!option.paged.} }; 
+    HFS = { folder:'{.js encode|%folder%.}', number:%number%, paged:{.!option.paged.} };
     </script>
 	<script type="text/javascript" src="/?mode=section&id=lib.js"></script>
-	{.add header | Access-Control-Allow-Origin: * .} 
+
+	{.add header | Access-Control-Allow-Origin: * .}
 	{.comment | skb: add CORS header .}
 </head>
 <body>
@@ -55,7 +55,7 @@ COMMENT skb: no move or folders!
 
 [list]
 <div id='files_outer'>
-	<div style='height:1.6em;'></div> {.comment| this is quite ugly, i know, but if i use any vertical padding with height:100% i'll get a scrollbar .} 
+	<div style='height:1.6em;'></div> {.comment| this is quite ugly, i know, but if i use any vertical padding with height:100% i'll get a scrollbar .}
 	{.if not| %number% |{: <div style='font-size:200%; padding:1em;'>{.!No {.if|{.length|{.?search.}.}|results|files.}.}</div> :}|{:
         <form method='post'>
             <table id='files'>
@@ -79,14 +79,14 @@ COMMENT skb: no move or folders!
     {.$box server info.}
 </div>
 
-[box messages] 
+[box messages]
 	<fieldset id='msgs'>
 		<legend><img src="/~img10"> {.!Messages.}</legend>
 		<ul style='padding-left:2em'>
 		</ul>
 	</fieldset>
 
-[box login]		
+[box login]
 	<fieldset id='login'>
 		<legend><img src="/~img27"> {.!User.}</legend>
 		<center>
@@ -96,7 +96,7 @@ COMMENT skb: no move or folders!
             | <a href="~login">Login</a>
         .}
 		</center>
-	</fieldset>                                       
+	</fieldset>
 
 [box folder]
 	<fieldset id='folder'>
@@ -112,10 +112,10 @@ COMMENT skb: no move or folders!
 		{.comment|we need this to start from 1 {.count|folder levels.}.}
 		{.breadcrumbs|{:<a href="%bread-url%" {.if|{.length|%bread-name%.}|style='padding-left:{.calc|{.count|folder levels.}*0.7.}em;'.} /> {.if|{.length|%bread-name%.}|&raquo; %bread-name%|<img src="/~img1"> {.!Home.}.}</a>:} .}
        </div>
-        
+
 		<div id='folder-stats'>%number-folders% {.!folders.}, %number-files% {.!files.}, {.add bytes|%total-size%.}
 		</div>
-		
+
 		{.123 if 2| <div id='foldercomment'>|{.commentNL|%folder-item-comment%.}|</div> .}
 	</fieldset>
 
@@ -134,7 +134,7 @@ COMMENT skb: no move or folders!
 		</center>
 	</fieldset>
 
-[box selection]	
+[box selection]
 	<fieldset id='select' class='onlyscript'>
 		<legend><img src="/~img13"> {.!Select.}</legend>
 		<center>
@@ -160,13 +160,13 @@ COMMENT skb: no move or folders!
 		<fieldset id='upload'>
     		<legend><img src="/~img32"> {.!Upload.}</legend>
     		<form action="." method='post' enctype="multipart/form-data" style='text-align:right;'>
-    		<input type='file' name='file' style='display:block;' />
+    		<input type='file' name='file' multiple style='display:block;' />
     		<input type='submit' value='{.!Upload.}' style='margin-top:0.5em;' />
     		</form>
 		</fieldset>
 	:}.}
 
-[box actions]	
+[box actions]
 	<fieldset id='actions'>
 		<legend><img src="/~img9"> {.!Actions.}</legend>
 		<center>
@@ -176,11 +176,11 @@ COMMENT skb: no move or folders!
 			<button id='markRunBtn' onclick='markShiftRun()'>Mark Complete</button>
 			<button id='markUnrunBtn' onclick='markShiftUnrun()'>Mark Ready</button><br>
 		.}
-		
+
 		{.if|{.can comment.}|
 			<button id='commentBtn' onclick='setComment.call(this)'>Comment</button>
 		.}
-		
+
 		{.if|{.get|can delete.}|
 			<button id='deleteBtn' onclick='
 				var a = selectedItems();
@@ -190,7 +190,7 @@ COMMENT skb: no move or folders!
 				if (confirm("Delete selected file(s)?")) submit({action:"delete"}, "{.get|url.}")'>Delete</button>
 		.}
 		<br>
-		
+
 		{.if|{.get|can archive.}|
 			<button id='archiveBtn' onclick='
 				var a = selectedItems();
@@ -200,7 +200,7 @@ COMMENT skb: no move or folders!
 				if (confirm("Download selected files as a .tar file?")) submit({}, "{.get|url|mode=archive.}");'
 			>Multi-Download</button>
 		.}
-		
+
 		<a href="{.get|url|tpl=list|sort=|{.if not|{.length|{.?search.}.}|{:folders-filter=\|recursive:}.}.}">(Text Listing)</a>
 		</center>
 	</fieldset>
@@ -248,9 +248,9 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 #files td:first-child { text-align:left; }
 #files td.nosize { text-align:center; font-style:italic; }
 #files .selector { display:none; }
-#actions button { margin:0.2em; width:120px} 
+#actions button { margin:0.2em; width:120px}
 #breadcrumbs { margin-top:1em; padding-left:0.5em; }
-#breadcrumbs a { padding:0.15em 0; border-width:2px; display:block; }
+#breadcrumbs a { padding:0.15em 0; border-width:2px; display:block; word-break:break-all; }
 #folder-stats, #foldercomment { margin-top:1em; padding-top:0.5em; border-top:1px solid #666;  }
 #folder-stats { color:#666; text-align:center; }
 #msgs { display:none; }
@@ -260,19 +260,19 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 .selectedPage { font-weight:bold; font-size:larger; }
 .hidden { display:none; }
 .fltRt {float: right;}
-                             
+
 [file=folder=link|private]
 	<tr class='{.if|{.mod|{.count|row.}|2.}|even.}'><td>
 		{.if | {.is file | {.vfs to disk|%item-name%.} .} |
 			{:
 			<label>
 				<input type='checkbox' class='selector' name='selection' value="%item-url%">
-				<img src="%item-icon%"> %item-name% 
+				<img src="%item-icon%"> %item-name%
 			</label>
 			{.if not|{.get|can access.}|<img src='/~img_lock'>.}
 			<a href="%item-url%" class="fltRt">View</a>
 			{.123 if 2|<div class='comment'>|{.commentNL|%item-comment%.}|</div>.}
-			:} 
+			:}
 			|
 			{:
 				{.if not|{.get|can access.}|<img src='/~img_lock'>.}
@@ -368,7 +368,7 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 [upload-success]
 {.inc|ok.}
 <li> <a href="%item-url%">%item-name%</a>
-<br />%item-size% @ %speed% KB/s
+<br />%item-size% @ %smart-speed%B/s
 
 [upload-failed]
 {.inc|ko.}
@@ -416,8 +416,7 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 {.break|if={.exists|{.^y.}.}|result=exists.}
 {.break|if={.not|{.length|{.rename|{.^x.}|{.^y.}.}.}.}|result=failed.}
 {.add to log|User %user% renamed "{.^x.}" to "{.^y.}".}
-ok
-
+{.pipe|ok.}
 [ajax.comment|no log]
 {.check session.}
 {.break|if={.not|{.can comment.}.} |result=forbidden.}
@@ -425,11 +424,11 @@ ok
 	{.break|if={.is file protected|var=fn.}|result=forbidden.}
     {.set item|{.force ansi|%folder%{.^fn.}.}|comment={.encode html|{.force ansi|{.postvar|text.}.}.}.}
 :}.}
-ok
+{.pipe|ok.}
 
 
 [special:alias]
-check session=break|if={.{.cookie|HFS_SID.} != {.postvar|token.}.}|result=bad session
+check session=if|{.{.cookie|HFS_SID_.} != {.postvar|token.}.}|{:{.cookie|HFS_SID_|value=|expires=-1.} {.break|result=bad session}:}
 can mkdir=and|{.get|can upload.}|{.!option.newfolder.}
 can comment=and|{.get|can upload.}|{.!option.comment.}
 can rename=and|{.get|can delete.}|{.!option.rename.}
@@ -471,20 +470,20 @@ $(function(){
         fileTpl.clone(true).insertAfter(this).css('display','block');
     });
     // we must create an empty "template", by cloning before it's set to a file, because on some browsers (Opera 10) emptying the value run-time is not allowed.
-    // this must be done after the above instruction, so we'll clone also the behavior. 
+    // this must be done after the above instruction, so we'll clone also the behavior.
     var fileTpl = x.clone(true).css('display','none');
 
     var x = $('#upload');
     if  (x.length) {
         // make it popup by button, so we save some vertical space and avoid some scrollbar
-        x.hide(); 
+        x.hide();
         $('#actions button:last').before(
-            $("<button>{.!Upload.}</button>").click(function(){ 
-                $(this).slideUp(); x.fadeIn(); 
+            $("<button>{.!Upload.}</button>").click(function(){
+                $(this).slideUp(); x.fadeIn();
             })
         );
-        // on submit			
-        x.find('form').submit(function(){ 
+        // on submit
+        x.find('form').submit(function(){
             if (!$("[name=file]").val()) return false; // no file, no submit
             $(this).hide(); // we don't need the form anymore, make space for the progress bars
             // build the gui
@@ -492,7 +491,7 @@ $(function(){
             x.append($("<button style='float:right'>{.!Cancel.}</button>").click(function(){
                 // stop submit/upload
                 if (typeof stop == 'function')
-                    stop(); 
+                    stop();
                 else
                     document.execCommand("Stop");
                 $(this).add($("#progress")).remove(); // remove progress indicators and this button too
@@ -536,7 +535,7 @@ $(function(){
         var a = '';
         var ps = [];
         switch ($('[name=where]:checked').val()) {
-            case 'anywhere': 
+            case 'anywhere':
                 a = '/';
             case 'fromhere':
                 ps.push('search='+s);
@@ -550,14 +549,14 @@ $(function(){
         location = a+'?'+ps.join('&');
         return false;
     });
-    
+
     // workaround for those browsers not supporting :first-child selector used in style
     if ($('#files td:first').css('text-align') != 'left')
         $('#files tr td:first-child').css('text-align','left');
 
     // here we make some changes trying to make the panel fit the window
     var removed = 0;
-    var e = $('#panel'); 
+    var e = $('#panel');
     while (outsideV(e)) {
         switch (++removed) {
             case 1: $('#serverinfo').hide(); continue;
@@ -572,7 +571,7 @@ $(function(){
             addPagingButton('#actions button:first');
         else
             pageIt();
-               
+
     {.$more onload.}
     selectedChanged();
     // darn you ie6!
@@ -586,7 +585,7 @@ $(function(){
 function ajax(method, data, cb) {
 	if (!data)
 		data = {};
-	data.token = getCookie('HFS_SID');
+	data.token = "{.cookie|HFS_SID_.}";
 	return $.post("?mode=section&id=ajax."+method, data, cb||getStdAjaxCB());
 }//ajax
 
@@ -598,7 +597,7 @@ function selectedChanged() {
 function getItemName(el) {
     if (typeof el == 'undefined')
         return false;
-    // we handle elements, not jquery sets  
+    // we handle elements, not jquery sets
     if (el.jquery)
         if (el.length)
             el = el[0];
@@ -618,7 +617,7 @@ function getItemName(el) {
     if (s.slice(-1) == '/')
         s = s.slice(0,-1);
     // it is encoded
-    s = (decodeURIComponent || unescape)(s);        
+    s = (decodeURIComponent || unescape)(s);
     return s;
 } // getItemName
 
@@ -657,7 +656,7 @@ function include(url, type) {
     var res;
     if  (type == 'js')
         res = $.getScript(url);
-    else res = $.get(url, function(){ 
+    else res = $.get(url, function(){
         if (type == 'css')
             $('head').append('<link rel="stylesheet" href="'+url+'" type="text/css" />');
     });
@@ -673,7 +672,7 @@ function ezprompt(msg, options, cb) {
     }
     if (!$.prompt) { // load on demand
         include('/?mode=section&id=impromptu.css');
-        include('/?mode=section&id=jquery.impromptu.js'); 
+        include('/?mode=section&id=jquery.impromptu.js');
     }
     var v;
     if (v = options.type) {
@@ -688,14 +687,14 @@ function ezprompt(msg, options, cb) {
     $.prompt(msg, {
         opacity: 0.8,
         overlayspeed: 'fast',
-        loaded: function(){  
+        loaded: function(){
             $('#jqibox').find(':input').keypress(function (e) {
                 var c = (e.keyCode || e.which);
                 if (options.keypress && options.keypress(c, this, e) === false) return;
                 if (c != 13 || this.tagName == 'TEXTAREA') return; // ENTER key is like submit, but not in textarea
                 $('.jqibuttons button:first').click();
                 return false;
-            }).filter(':first').focus()[0].select(); 
+            }).filter(':first').focus()[0].select();
         },
         submit: function(val,div,form) {
             var res = cb(options.type ? form.txt : form, $('#jqibox'), options.cbData );
@@ -704,7 +703,7 @@ function ezprompt(msg, options, cb) {
                 return false;
             }
             return true;
-        }, 
+        },
         fadeClicked: function() { $('#jqibox').find(':input:first').focus(); }
     });
 }//ezprompt
@@ -715,13 +714,16 @@ function getStdAjaxCB(what2do) {
         what2do = true;
     return function(res){
         res = $.trim(res);
-        if (res != "ok") {
-			alert("{.!Error.}: "+res);
+
+        if (res !== "ok") {
+            alert("{.!Error.}: "+res);
+            if (res === 'bad session')
+                location.reload();
             return false;
-		}
+        }
         // what2do is a list of actions we are supposed to do if the ajax result is "ok"
-        if (typeof what2do == 'undefined') 
-            return true;            
+        if (typeof what2do == 'undefined')
+            return true;
         if (!$.isArray(what2do))
             what2do = [what2do];
         for (var i=0; i<what2do.length; i++) {
@@ -740,7 +742,7 @@ function getStdAjaxCB(what2do) {
 		return true;
     }
 }//getStdAjaxCB
-        
+
 
 function selectedItems() { return $('#files .selector:checked') }
 
@@ -776,7 +778,7 @@ function setShiftFilter() {
 		fileTag = "BUS_";
 	}
 	newSearch = "?filter=" + fileTag;
-	
+
 		str = document.getElementById("filtProj").value.trim().toUpperCase();
 	if (!str) {
 		str = "?";
@@ -805,7 +807,7 @@ function setShiftFilter() {
 
 $( document ).ready(function() {
 	var sstr = window.location.search, tmp;
-	
+
 	if (sstr) {
 		if ("?filter=" === sstr.substr(0, 8)) {
 			sstr = sstr.substr(8);
@@ -835,11 +837,11 @@ $( document ).ready(function() {
 // then append the part after offs + len. Rename file with the new name
 
 function changeShiftName(fileAry, elem, repStr, offs, len) {
-	var it = {}; 
-	
+	var it = {};
+
 	it.oldName = getItemName(elem);
 	it.newName = "";
-	
+
 	it.newName = it.oldName.slice(0, offs) + repStr;
 	it.newName += it.oldName.slice(offs + len);
 	if (it.newName != it.oldName) {
@@ -888,7 +890,7 @@ var renameMultipleFiles = function(fAry) {
 			}
 		};
 	};
-	
+
 	if (fAry.length) {
 		it = fAry.shift();
 		ajax("rename", {from:it.oldName, to:it.newName}, getCB(fAry));
@@ -900,7 +902,7 @@ function markShiftRun() {
 	var a = selectedItems(), fileAry = [];
 	if (a.length < 1) {
 		return alert("You must select one or more Shifts to mark as completed. (Completed shifts will not be listed on the tablets by default)");
-	}	
+	}
 	a.each(function(index, elem){
 		return changeShiftName(fileAry, elem, "~", 7, 1);
 	});
@@ -921,7 +923,7 @@ function markShiftUnrun() {
 	if (fileAry.length) {	// some files to rename
 		putMsg("{.!Clearing shift complete flag on " + fileAry.length + " shift files.}");
 		setTimeout(function() {renameMultipleFiles(fileAry);}, 10);
-	}	
+	}
 }// markShiftUnrun
 
 function doRename() {
@@ -947,7 +949,7 @@ function selectionMask() {
             s = RegExp.escape(s).replace(/[?]/g,".");;
             if (s.match(/\\\*/)) {
                 s = s.replace(/\\\*/g,".*");
-                s = "^ *"+s+" *$";   // in this case let the user decide exactly how it is placed in the string  
+                s = "^ *"+s+" *$";   // in this case let the user decide exactly how it is placed in the string
             }
             re = new RegExp(s, "i");
         }
@@ -955,7 +957,7 @@ function selectionMask() {
             .filter(function(){ return invert ^ re.test(getItemName(this)); })
             .closest('tr').addClass("selected").find('.selector').attr('checked',true);
         selectedChanged();
-    }); 
+    });
 }//selectionMask
 
 function setCookie(name,value,days) {
@@ -968,7 +970,7 @@ function setCookie(name,value,days) {
 	document.cookie = name+"="+value+expires+"; path=/";
 } // setCookie
 
-function getCookie(name) {    
+function getCookie(name) {
     var a = document.cookie.match(new RegExp('(^|;\s*)('+name+'=)([^;]*)'));
     return (a && a[2]) ? a[3] : null;
 } // getCookie
@@ -977,21 +979,21 @@ function delCookie(name) {
 	setCookie(name,"",-1);
 } // delCookie
 
-    
+
 [jquery.impromptu.js|no log]
 /*
  * jQuery Impromptu
  * By: Trent Richardson [http://trentrichardson.com]
  * Version 2.7
  * Last Modified: 6/7/2009
- * 
+ *
  * Copyright 2009 Trent Richardson
  * Dual licensed under the MIT and GPL licenses.
  * http://trentrichardson.com/Impromptu/GPL-LICENSE.txt
  * http://trentrichardson.com/Impromptu/MIT-LICENSE.txt
- * 
+ *
  */
- 
+
 (function($) {
 	$.prompt = function(message, options) {
 		options = $.extend({},$.prompt.defaults,options);
@@ -1048,7 +1050,7 @@ function delCookie(name) {
 		//insert the states...
 		$jqi.find('#'+ options.prefix +'states').html(states).children('.'+ options.prefix +'_state:first').css('display','block');
 		$jqi.find('.'+ options.prefix +'buttons:empty').css('display','none');
-		
+
 		//Events
 		$.each(message,function(statename,stateobj){
 			var $state = $jqi.find('#'+ options.prefix +'_state_'+ statename);
@@ -1065,8 +1067,8 @@ function delCookie(name) {
 					} else if (typeof forminputs[obj.name] == Array) {
 						forminputs[obj.name].push(obj.value);
 					} else {
-						forminputs[obj.name] = [forminputs[obj.name],obj.value];	
-					} 
+						forminputs[obj.name] = [forminputs[obj.name],obj.value];
+					}
 				});
 
 				var close = stateobj.submit(clicked,msg,forminputs);
@@ -1099,34 +1101,34 @@ function delCookie(name) {
 				removePrompt();
 			}
 		};
-		
+
 		var keyPressEventHandler = function(e){
 			var key = (window.event) ? event.keyCode : e.keyCode; // MSIE or Firefox?
-			
+
 			//escape key closes
 			if(key==27) {
-				removePrompt();	
+				removePrompt();
 			}
-			
+
 			//constrain tabs
 			if (key == 9){
 				var $inputels = $(':input:enabled:visible',$jqib);
 				var fwd = !e.shiftKey && e.target == $inputels[$inputels.length-1];
 				var back = e.shiftKey && e.target == $inputels[0];
 				if (fwd || back) {
-				setTimeout(function(){ 
+				setTimeout(function(){
 					if (!$inputels)
 						return;
 					var el = $inputels[back===true ? $inputels.length-1 : 0];
 
 					if (el)
-						el.focus();						
+						el.focus();
 				},10);
 				return false;
 				}
 			}
 		};
-		
+
 		var positionPrompt = function(){
 			$jqib.css({
 				position: (ie6) ? "absolute" : "fixed",
@@ -1192,7 +1194,7 @@ function delCookie(name) {
 
 		positionPrompt();
 		stylePrompt();
-		
+
 		//ie6, add a scroll event to fix position:fixed
 		if(ie6) {
 			$window.scroll(ie6scroll);
@@ -1206,13 +1208,13 @@ function delCookie(name) {
 		$jqif.fadeIn(options.overlayspeed);
 		$jqi[options.show](options.promptspeed,options.loaded);
 		$jqi.find('#'+ options.prefix +'states .'+ options.prefix +'_state:first .'+ options.prefix +'defaultbutton').focus();
-		
+
 		if(options.timeout > 0)
 			setTimeout($.prompt.close,options.timeout);
 
 		return $jqib;
 	};
-	
+
 	$.prompt.defaults = {
 		prefix:'jqi',
 		buttons: {
@@ -1248,64 +1250,64 @@ function delCookie(name) {
 		   }
 	  	}
 	};
-	
+
 	$.prompt.currentPrefix = $.prompt.defaults.prefix;
 
 	$.prompt.setDefaults = function(o) {
 		$.prompt.defaults = $.extend({}, $.prompt.defaults, o);
 	};
-	
+
 	$.prompt.setStateDefaults = function(o) {
 		$.prompt.defaults.state = $.extend({}, $.prompt.defaults.state, o);
 	};
-	
+
 	$.prompt.getStateContent = function(state) {
 		return $('#'+ $.prompt.currentPrefix +'_state_'+ state);
 	};
-	
+
 	$.prompt.getCurrentState = function() {
 		return $('.'+ $.prompt.currentPrefix +'_state:visible');
 	};
-	
+
 	$.prompt.getCurrentStateName = function() {
 		var stateid = $.prompt.getCurrentState().attr('id');
-		
+
 		return stateid.replace($.prompt.currentPrefix +'_state_','');
 	};
-	
+
 	$.prompt.goToState = function(state) {
 		$('.'+ $.prompt.currentPrefix +'_state').slideUp('slow');
 		$('#'+ $.prompt.currentPrefix +'_state_'+ state).slideDown('slow',function(){
 			$(this).find('.'+ $.prompt.currentPrefix +'defaultbutton').focus();
 		});
 	};
-	
+
 	$.prompt.nextState = function() {
 		var $next = $('.'+ $.prompt.currentPrefix +'_state:visible').next();
 
 		$('.'+ $.prompt.currentPrefix +'_state').slideUp('slow');
-		
+
 		$next.slideDown('slow',function(){
 			$next.find('.'+ $.prompt.currentPrefix +'defaultbutton').focus();
 		});
 	};
-	
+
 	$.prompt.prevState = function() {
 		var $next = $('.'+ $.prompt.currentPrefix +'_state:visible').prev();
 
 		$('.'+ $.prompt.currentPrefix +'_state').slideUp('slow');
-		
+
 		$next.slideDown('slow',function(){
 			$next.find('.'+ $.prompt.currentPrefix +'defaultbutton').focus();
 		});
 	};
-	
+
 	$.prompt.close = function() {
 		$('#'+ $.prompt.currentPrefix +'box').fadeOut('fast',function(){
         		$(this).remove();
 		});
 	};
-	
+
 })(jQuery);
 
 [impromptu.css|no log]
@@ -1315,61 +1317,61 @@ function delCookie(name) {
 ------------------------------
 */
 .jqifade{
-	position: absolute; 
-	background-color: #aaaaaa; 
+	position: absolute;
+	background-color: #aaaaaa;
 }
-div.jqi{ 
-	min-width: 300px; 
-	max-width: 600px; 
-	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; 
-	position: absolute; 
-	background-color: #ffffff; 
-	font-size: 11px; 
-	text-align: left; 
+div.jqi{
+	min-width: 300px;
+	max-width: 600px;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	position: absolute;
+	background-color: #ffffff;
+	font-size: 11px;
+	text-align: left;
 	border: solid 1px #eeeeee;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
 	padding: 7px;
 }
-div.jqi .jqicontainer{ 
-	font-weight: bold; 
+div.jqi .jqicontainer{
+	font-weight: bold;
 }
-div.jqi .jqiclose{ 
+div.jqi .jqiclose{
 	position: absolute;
-	top: 4px; right: -2px; 
-	width: 18px; 
-	cursor: default; 
-	color: #bbbbbb; 
-	font-weight: bold; 
+	top: 4px; right: -2px;
+	width: 18px;
+	cursor: default;
+	color: #bbbbbb;
+	font-weight: bold;
 }
-div.jqi .jqimessage{ 
-	padding: 10px; 
-	line-height: 20px; 
-	color: #444444; 
+div.jqi .jqimessage{
+	padding: 10px;
+	line-height: 20px;
+	color: #444444;
 }
-div.jqi .jqibuttons{ 
-	text-align: right; 
-	padding: 5px 0 5px 0; 
-	border: solid 1px #eeeeee; 
+div.jqi .jqibuttons{
+	text-align: right;
+	padding: 5px 0 5px 0;
+	border: solid 1px #eeeeee;
 	background-color: #f4f4f4;
 }
-div.jqi button{ 
-	padding: 3px 10px; 
-	margin: 0 10px; 
-	background-color: #2F6073; 
-	border: solid 1px #f4f4f4; 
-	color: #ffffff; 
-	font-weight: bold; 
-	font-size: 12px; 
+div.jqi button{
+	padding: 3px 10px;
+	margin: 0 10px;
+	background-color: #2F6073;
+	border: solid 1px #f4f4f4;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 12px;
 }
-div.jqi button:hover{ 
+div.jqi button:hover{
 	background-color: #728A8C;
 }
-div.jqi button.jqidefaultbutton{ 
+div.jqi button.jqidefaultbutton{
 	/*background-color: #8DC05B;*/
 	background-color: #BF5E26;
 }
-.jqiwarning .jqi .jqibuttons{ 
+.jqiwarning .jqi .jqibuttons{
 	background-color: #BF5E26;
 }
 
@@ -1386,7 +1388,7 @@ div.jqi button.jqidefaultbutton{
 div.impromptu{
     position: absolute;
 	background-color: #cccccc;
-	padding: 10px; 
+	padding: 10px;
 	width: 300px;
 	text-align: left;
 }
@@ -1398,7 +1400,7 @@ div.impromptu .impromptuclose{
 }
 div.impromptu .impromptucontainer{
 	background-color: #213e80;
-	padding: 5px; 
+	padding: 5px;
 	color: #ffffff;
 	font-weight: bold;
 }
@@ -1428,7 +1430,7 @@ div.impromptu button{
 div.colsJqi{
     position: absolute;
 	background-color: #d0dEb6;
-	padding: 10px; 
+	padding: 10px;
 	width: 400px;
 	text-align: left;
 }
@@ -1440,7 +1442,7 @@ div.colsJqi .colsJqiclose{
 }
 div.colsJqi .colsJqicontainer{
 	background-color: #e0eEc6;
-	padding: 5px; 
+	padding: 5px;
 	color: #ffffff;
 	font-weight: bold;
 	height: 160px;
@@ -1562,4 +1564,3 @@ div.extblue .extbluecontainer{ background-color: #CAD8EA; padding: 0 5px 5px 5px
 div.extblue .extbluemessage{ background-color: #CAD8EA; padding: 0; margin:0 15px 15px 15px; }
 div.extblue .extbluebuttons{ text-align: center; padding: 0px 0 0 0; }
 div.extblue button{ padding: 1px 4px; margin: 0 10px; background-color:#cccccc; font-weight:normal; font-family:Verdana; font-size:10px; }
-
