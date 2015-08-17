@@ -1,9 +1,14 @@
 [+upload completed]
-{.if|{.=|%item-ext%|tar|.}|
-	{:{.exec|C:\hfs\bin\untar.bat {.vfs to disk|%folder%.}.}:}.}
-{.if|{.=|%item-ext%|zip|.}|
-	{:{.exec|C:\hfs\bin\unzip.bat {.vfs to disk|%folder%.}.}:}.}
+{.if|{.%item-size-kb% > 100.}|Sorry, upload size limit is 100 KB. .}
 
+[connected]
+{.set|#log|{.load|log\stunnel.log|from={.^#stunnel.last.}.}.}
+{.set|#stunnel.last|{.filesize|log\stunnel.log.}.}
+{.if|{.^#log.}|{:
+{.add to log|.
+Stunnel log :
+{.^#log.}|Clblue.}
+:}.}
 
-[+on macro rename]
-{.exec|C:\hfs\bin\touch.exe -c {.vfs to disk|%new-name%.}.}
+[+start]
+{.set|#stunnel.last|{.filesize|log\stunnel.log.}.}
