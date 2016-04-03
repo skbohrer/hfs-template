@@ -12,7 +12,7 @@ put this text [+special:strings]
 and following all the options you want to change, using the same syntax you see here.
 
 [+special:strings]
-RCVersion=RideCheck Server Version 1.1
+RCVersion=RideCheck Server Version SC_1.0
 option.paged=0
 COMMENT this option causes your file list to be paged by default
 COMMENT skb: no paging!
@@ -123,6 +123,9 @@ COMMENT skb: no move or folders!
 	<fieldset id='rcfilter'>
 	<legend><img src="/~img7"> Filter Shifts </legend>
 		<center>
+		Type: <input type="radio" id="filtTypeRide" name="filtType" value="BUS">Ride Check.
+		<input type="radio" id="filtTypeStand" name="filtType" value="SCS">Standing Check.
+		<input type="radio" id="filtTypeAll" name="filtType" value="???">All files.<br>
 		Project: <input type="text" id="filtProj" size ="1" maxlength="1" value="?">
 		ID: <input type="text" id="filtId" size ="2" maxlength="2" value="??">
 		Shift: <input type="text" id="filtShift" size ="5" value="*"><br>
@@ -770,14 +773,25 @@ function clearShiftFilter() {
 }
 
 function setShiftFilter() {
-	var newSearch, fileTag;
+	var str, newSearch, fileTag;
 
-	if ("DAT" === window.location.pathname.substr(1, 3)) {
-		fileTag = "DAT_";
-	} else {
-		fileTag = "BUS_";
+	// file type select: BUS for RideCheck, SCS for stand check, ??? for all
+	fileTag = $("input[type='radio'][name='filtType']:checked").val();
+	if (!fileTag) {
+		fileTag = '???';
 	}
-	newSearch = "?filter=" + fileTag;
+
+
+	// see if we are in the /DAT folders : modifiy file tag if specific
+	// file tag is either ??? for all; BUS or DAT for Ride check; SCS or CSC for standing check
+	if ("DAT" === window.location.pathname.substr(1, 3)) {
+		if (fileTag === "BUS") {
+			fileTag = "DAT";
+		} else if (fileTag === "SCS") {
+			fileTag = "CSC";
+		}
+	}
+	newSearch = "?filter=" + fileTag + "_";
 
 		str = document.getElementById("filtProj").value.trim().toUpperCase();
 	if (!str) {
@@ -799,7 +813,7 @@ function setShiftFilter() {
 	} else {
 		newSearch += "*";
 	}
-	if (newSearch === "?filter=" + fileTag + "????*") {
+	if (newSearch === "?filter=???_????*") {
 		newSearch = "";		// Blank filter : show all files
 	}
 	window.location.search = newSearch;
@@ -811,10 +825,22 @@ $( document ).ready(function() {
 	if (sstr) {
 		if ("?filter=" === sstr.substr(0, 8)) {
 			sstr = sstr.substr(8);
-			if ("BUS_" === sstr.substr(0,4) || "DAT_" === sstr.substr(0, 4)) {
+			tmp = sstr.substr(0,4);
+				// is this one of our filters?
+			if ("BUS_" === tmp || "DAT_" === tmp || "SCS_" === tmp || "CSC_" === tmp || "???_" = tmp) {
+					// if so, set the file type radio button
+				if ("BUS_" === tmp || "DAT_" === tmp) {
+					tmp = "filtTypeRide";
+				} else if ("SCS_" === tmp || "CSC_" === tmp) {
+					tmp = filtTypeStand;
+				} else {
+					tmp = filtTypeAll;
+				}
+				document.getElementById(tmp).checked = true;
 				sstr = sstr.substr(4);
 				document.getElementById("filtProj").value = sstr.substr(0, 1);
 				document.getElementById("filtId").value = sstr.substr(1, 2);
+					// now set the shift status radio button
 				tmp = sstr.substr(3, 1);
 				if (tmp === "_") {
 					tmp = "filtRadUnrun";
