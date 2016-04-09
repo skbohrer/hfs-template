@@ -123,15 +123,16 @@ COMMENT skb: no move or folders!
 	<fieldset id='rcfilter'>
 	<legend><img src="/~img7"> Filter Shifts </legend>
 		<center>
-		Type: <input type="radio" id="filtTypeRide" name="filtType" value="BUS">RideCk.
-		<input type="radio" id="filtTypeStand" name="filtType" value="SCS">StandingCk.
-		<input type="radio" id="filtTypeAll" name="filtType" value="???">All.<br>
+		Type: <input type="radio" id="filtRadTypeRide" name="radType" value="BUS">Ride Ck.
+		<input type="radio" id="filtRadTypeStand" name="radType" value="SCS">Standing Ck.
+		<input type="radio" id="filtRadTypeAll" name="radType" value="???">All.<br>
 		Project: <input type="text" id="filtProj" size ="1" maxlength="1" value="?">
 		ID: <input type="text" id="filtId" size ="2" maxlength="2" value="??">
 		Shift: <input type="text" id="filtShift" size ="5" value="*"><br>
 		State: <input type="radio" id="filtRadUnrun" name="filtRadio" value="_">Ready.
 		<input type="radio" id="filtRadRun" name="filtRadio" value="~">Complete.
-		<input type="radio" id="filtRadAll" name="filtRadio" value="?">All.<br><hr>
+		<input type="radio" id="filtRadAll" name="filtRadio" value="?">All.<br>
+		<hr>
 		<button onclick='clearShiftFilter()'>Clear Filter</button>
 		<button onclick='setShiftFilter()'>Set Filter</button>
 		</center>
@@ -776,11 +777,10 @@ function setShiftFilter() {
 	var str, newSearch, fileTag;
 
 	// file type select: BUS for RideCheck, SCS for stand check, ??? for all
-	fileTag = $("input[type='radio'][name='filtType']:checked").val();
+	fileTag = $("input[type='radio'][name='radType']:checked").val();
 	if (!fileTag) {
 		fileTag = '???';
 	}
-
 
 	// see if we are in the /DAT folders : modifiy file tag if specific
 	// file tag is either ??? for all; BUS or DAT for Ride check; SCS or CSC for standing check
@@ -793,7 +793,7 @@ function setShiftFilter() {
 	}
 	newSearch = "?filter=" + fileTag + "_";
 
-		str = document.getElementById("filtProj").value.trim().toUpperCase();
+	str = document.getElementById("filtProj").value.trim().toUpperCase();
 	if (!str) {
 		str = "?";
 	}
@@ -816,7 +816,7 @@ function setShiftFilter() {
 	if (newSearch === "?filter=???_????*") {
 		newSearch = "";		// Blank filter : show all files
 	}
-	window.location.search = newSearch;
+	window.location.search = newSearch; 
 }//setFilter
 
 $( document ).ready(function() {
@@ -826,21 +826,18 @@ $( document ).ready(function() {
 		if ("?filter=" === sstr.substr(0, 8)) {
 			sstr = sstr.substr(8);
 			tmp = sstr.substr(0,4);
-				// is this one of our filters?
-			if ("BUS_" === tmp || "DAT_" === tmp || "SCS_" === tmp || "CSC_" === tmp || "???_" = tmp) {
-					// if so, set the file type radio button
+			if ("BUS_" === tmp || "DAT_" === tmp || "SCS_" === tmp || "CSC_" === tmp || "???_" === tmp) {
 				if ("BUS_" === tmp || "DAT_" === tmp) {
-					tmp = "filtTypeRide";
+					tmp = "filtRadTypeRide";
 				} else if ("SCS_" === tmp || "CSC_" === tmp) {
-					tmp = filtTypeStand;
+					tmp = "filtRadTypeStand";
 				} else {
-					tmp = filtTypeAll;
+					tmp = "filtRadTypeAll";
 				}
 				document.getElementById(tmp).checked = true;
-				sstr = sstr.substr(4);
+				sstr = sstr.substr(4);		// skip BUS_
 				document.getElementById("filtProj").value = sstr.substr(0, 1);
 				document.getElementById("filtId").value = sstr.substr(1, 2);
-					// now set the shift status radio button
 				tmp = sstr.substr(3, 1);
 				if (tmp === "_") {
 					tmp = "filtRadUnrun";
