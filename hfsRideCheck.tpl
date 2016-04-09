@@ -123,9 +123,9 @@ COMMENT skb: no move or folders!
 	<fieldset id='rcfilter'>
 	<legend><img src="/~img7"> Filter Shifts </legend>
 		<center>
-		Type: <input type="radio" id="filtTypeRide" name="filtType" value="BUS">Ride Check.
-		<input type="radio" id="filtTypeStand" name="filtType" value="SCS">Standing Check.
-		<input type="radio" id="filtTypeAll" name="filtType" value="???">All files.<br>
+		Type: <input type="radio" id="filtTypeRide" name="filtType" value="BUS">RideCk.
+		<input type="radio" id="filtTypeStand" name="filtType" value="SCS">StandingCk.
+		<input type="radio" id="filtTypeAll" name="filtType" value="???">All.<br>
 		Project: <input type="text" id="filtProj" size ="1" maxlength="1" value="?">
 		ID: <input type="text" id="filtId" size ="2" maxlength="2" value="??">
 		Shift: <input type="text" id="filtShift" size ="5" value="*"><br>
