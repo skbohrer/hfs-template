@@ -1,0 +1,43 @@
+This folder contains the current version of the hfs.exe web sever program, and an updated version of the hfsRideCheck.tpl template file which defines the appearance and functions of the website.
+
+This version,  SC_1.0, is the first version to support Standing Check files in addition to RideCheck files. 
+
+(All data input and output files are .CSV files; other extensions are blocked from uploaded to the server. 
+
+RideCheck input file names start with "BUS_", and computed RideCheck output files start with "DAT_".
+
+Standing Check input files start with "SCS_", for "Standing Check Source". Completed Standing Check output files start with "CSC_", for"Completed Standing Check".)
+
+
+INSTALLTION: 
+
+Stop the current RideCheck server. 
+
+Copy the hfs.exe and hfsRideCheck.tpl files to the C:\HFS folder on the server; you will be warned by Windows about overwriting the existing copies of these files. Click to allow the overwriting; it is important that the names of these files not be changed. 
+
+Then double-click the new hfs.exe file to start the server.
+
+
+
+RECEMENDED PREFERENCE SETTING: HFS PROGRAM AUTO-UPDATES
+
+Click the "Menu" button in the upper left corner of the HFS program window, and select the "Updates" sub-menu. If there is not already a check mark by the "Update Automatically" item, select this item to enable the HFS program to fetch and install new revisions from its source site when they are available.
+
+Also make sure there are check marks by these other items in the "Updates"s sub menu:
+ * Auto check every day
+ * Keep old version
+ * Update automatically
+ * Delay update to serve last requests
+
+
+ADDED FEATURE:
+
+The "Filter SHifts" dialog has a new line of choices to display only Standing Check or only RideCheck shift files. The default action is to show all types of files.
+
+Set the "Type:" control to "Ride Ck.", "Standing Ck.", or "All." and press "Set Filter" to have the file list view restricted to only the specified type of files.
+
+
+
+BUG FIX:
+
+Prevously quitting the browser did not always log out the current user; when this "sticky login" occured, it was necessary to clear the browser's history to have it log out of the HFS RideCheck site. HFS FileServer version 2.3g seems to have resolved this issue, so that quitting and restarting the browser logs the user out of the RideCheck site.
