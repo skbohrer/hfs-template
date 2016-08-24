@@ -1,0 +1,90 @@
+RideCheck HFS Update:  hfs.events version 2.0
+24 August 2016
+
+This update adds a server macro that will rename shift files in the /BUS folder to the 
+"completed" file state when a DAT_ or CSC_ file with the same name is uploaded to the 
+/DAT folder.
+
+The "completed" status is indicated by the 8th character in a BUS_ or SCS_ shift file:
+This character is an underscore (_) if the shift is marked as ready to be run, 
+or a tilde (~) if the shift is marked as already completed.
+
+The only effect of this character is that the File Download screen of the tablets 
+can be set to not list completed files, which can help the Ride Checkers to avoid 
+re-downloading shifts from the server that do not need to be run. The Admins can 
+on the RideCheck server web page also filter by completed status, e.g. to select 
+all completed shifts and delete them from the server.
+
+The admins can also select files on the server and mark them as ready or complete.
+This action changes the specific character of each selected file name.
+
+In addition, with this update, whenever a file is uploaded to the /DAT folder, the 
+server checks for a file in the /BUS folder with the same base file name. 
+If such a file is found, it is renamed with a ~ character in the completed position. 
+In any case, the DAT file is uploaded as usual.
+ 
+INSTALLATION:
+
+This update requires that the existing C:\HFS\hfs.events text file is replaced with 
+the new version included in this Zip file.
+
+ * If the user previously changed the upload file size limit from the default 
+   limit of 100KB, make this change to the new version of the hfs.events file 
+   before restarting the server. See NOTE below. 
+   
+Also, this update has a recommended change to HFS's logging, so that it 
+will use one log file per week. This keeps the files reasonably small, and also
+keeps each week of events together.
+
+
+Proceedure:
+
+1. Quit the HFS program to stop the HFS server.
+
+2. Extract the new hfs.events file from the provided Zip file.
+
+3. Drag the new hfs.events file in to the C:\HFS folder. Windows will warn you that the
+old file will be overwritten. Accept this choice. (This file must be named 
+"hfs.events", and must be in the same folder as the hfs.exe program file.)
+
+4. Restart the hfs.exe program to restart the server.
+
+5. Recommended change: 
+Open the HFS program window, and select the menu item:
+   "Menu > Log > Log to file..."
+
+6. In the "Log File" dialog box, set the file name to:
+   c:\hfs\log\hfslog%w%.txt
+   
+This setting causes the program to write to a new log file each week of the year, 
+with the log files named from "hfslog01.txt" through "hfslog52.txt".
+
+(Previously, the setting was for 7 log files based on the day of the week. 
+However, the log files not overwritten, but rather the new logs are appended 
+at the end. This was confusing with only the 7 files.
+
+If desired, the older log files can be deleted during the year.)
+
+This completes the installation.
+
+
+(*) NOTE: The hfs.events file also includes the limit on uploaded file size, 
+which is set to 100 KB by default. If the user has changed this limit in 
+their existing hfs.events file, this setting will be overwritten when
+they replace the file with the new version. Thus, if the setting was changed,
+edit the new version of the file to make this change.
+
+For reference, the default line in the new version of hfs.events is as follows:
+{.if|{.%item-size-kb% > 100.}|{:Sorry, upload size limit is 100 KB.{.break.}:}.}
+
+To change the file size limit, change _only_ the two instances of "100" to
+the desired value in kilo bytes. Do not copy the old version of this line to the
+new file. Instead, edit the new file, changing only the numeric values in the 
+above line.
+
+Note that if the limit is set smaller than the size of a completed DAT_ file, 
+then large uploads of completed shifts from the tablets will fail.
+
+Do not change any other text in the hfs.events file. The HFS server macro syntax is 
+unforgiving. Use only a plain text editor, such as "Notepad", to edit this file, 
+rather than a word processor. Do not add line breaks or change any punctuation.
