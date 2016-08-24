@@ -37,7 +37,7 @@ will use one log file per week. This keeps the files reasonably small, and also
 keeps each week of events together.
 
 
-Proceedure:
+Procedure:
 
 1. Quit the HFS program to stop the HFS server.
 
