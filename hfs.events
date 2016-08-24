@@ -1,14 +1,33 @@
 [+upload completed]
-{.if|{.%item-size-kb% > 100.}|Sorry, upload size limit is 100 KB. .}
+{.comment| HFS Upload file handling. V2.0 : rename /BUS shifts with ~ when /DAT file uploaded .}
 
-[connected]
-{.set|#log|{.load|log\stunnel.log|from={.^#stunnel.last.}.}.}
-{.set|#stunnel.last|{.filesize|log\stunnel.log.}.}
-{.if|{.^#log.}|{:
-{.add to log|.
-Stunnel log :
-{.^#log.}|Clblue.}
-:}.}
+{.comment| NOTE: Change the two "100" entries in the line below to set the file size limit, in KB.}
+{.if|{.%item-size-kb% > 100.}|{:Sorry, upload size limit is 100 KB.{.break.}:}.}
 
-[+start]
-{.set|#stunnel.last|{.filesize|log\stunnel.log.}.}
+
+{.if|{.=|{.filepath|%item-url%.}|/DAT/.} |
+	{:
+	{.set|PreFix|{.cut|1|4|{.filename|%item-url%.} .} .}
+	{.if|{.=|{.^PreFix.}|CSC_.} |
+		{:{.set|NewF|SCS_.}:} |
+		{:{.set|NewF|BUS_.}:}
+	.}
+	{.set|NewF|{.cut|5||{.decodeuri|{.filename|%item-url%.}.}.}|mode=append.}
+	{.set|BPath|{.vfs to disk|/BUS/.}.}
+	
+	{.if|{.is file|{.^BPath.}\{.^NewF.}.} |
+		{:
+		{.add to log|Upload to /DAT matches shift in /BUS|color=Green .}
+		{.set|SrcFN|{.^BPath.}\{.^NewF.}.}
+		{.set|DstFN|{.^BPath.}\{.cut|1|7|{.^NewF.}.}~{.cut|9||{.^NewF.}.}.}
+		{.if not|{.exists|{.^DstFN.}.} |
+			{:
+				{.add to log|Rename completed shift as {.^DstFN.}|color=Green .}
+				{.rename|{.^SrcFN.}|{.^DstFN.}.}
+			:} |
+			{:{.add to log|Can't rename: File {.^DstFN.} exists.|color=Red .}:}
+		.}
+		:}
+	.}
+	:}
+.}
