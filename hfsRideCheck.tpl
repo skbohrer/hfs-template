@@ -12,17 +12,17 @@ put this text [+special:strings]
 and following all the options you want to change, using the same syntax you see here.
 
 [+special:strings]
-RCVersion=RideCheck Server Version SC_1.0
+RCVersion=RideCheck Server Version SC_1.2
 option.paged=0
 COMMENT this option causes your file list to be paged by default
 COMMENT skb: no paging!
 
 option.newfolder=0
-option.move=0
+option.move=1
 option.comment=1
 option.rename=1
 COMMENT with these you can disable some features of the template. Please note this is not about user permissions, this is global!
-COMMENT skb: no move or folders!
+COMMENT skb: no folders! but had to enable moves for trash
 
 []
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
@@ -169,7 +169,8 @@ COMMENT skb: no move or folders!
     		</form>
 		</fieldset>
 	:}.}
-
+		
+	
 [box actions]
 	<fieldset id='actions'>
 		<legend><img src="/~img9"> {.!Actions.}</legend>
@@ -186,12 +187,12 @@ COMMENT skb: no move or folders!
 		.}
 
 		{.if|{.get|can delete.}|
-			<button id='deleteBtn' onclick='
+			<button id='trashBtn' onclick='
 				var a = selectedItems();
 				if (a.length < 1) {
-					return alert("You must select at least one file to delete.");
+					return alert("You must select at least one file to move to Trash.");
 				}
-				if (confirm("Delete selected file(s)?")) submit({action:"delete"}, "{.get|url.}")'>Delete</button>
+				if (confirm("Move selected file(s) to Trash?")) submit({action:"delete"}, "{.get|url.}")'> Delete </button>
 		.}
 		<br>
 
@@ -208,6 +209,30 @@ COMMENT skb: no move or folders!
 		<a href="{.get|url|tpl=list|sort=|{.if not|{.length|{.?search.}.}|{:folders-filter=\|recursive:}.}.}">(Text Listing)</a>
 		</center>
 	</fieldset>
+	
+[box xactions]
+	<fieldset id='actions'>
+		<legend><img src="/~img9"> {.!Actions.}</legend>
+		<center>
+
+		<button id='restoreBtn'> Restore </button>
+		
+		{.if|{.get|can delete.}|
+			<button id='delBtn' onclick='
+				var a = selectedItems();
+				if (a.length < 1) {
+					return alert("You must select at least one file to Delete.");
+				}
+				if (confirm("Delete selected file(s)?")) submit({action:"delete"}, "{.get|url.}")'> Delete </button>
+		.}
+		<br>
+
+		<a href="{.get|url|tpl=list|sort=|{.if not|{.length|{.?search.}.}|{:folders-filter=\|recursive:}.}.}">(Text Listing)</a>
+		</center>
+	</fieldset>
+	
+	
+
 
 [box server info]
 	<fieldset id='serverinfo'>
@@ -253,6 +278,7 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 #files td.nosize { text-align:center; font-style:italic; }
 #files .selector { display:none; }
 #actions button { margin:0.2em; width:120px}
+#xactions button { margin:0.2em; width:120px}
 #breadcrumbs { margin-top:1em; padding-left:0.5em; }
 #breadcrumbs a { padding:0.15em 0; border-width:2px; display:block; word-break:break-all; }
 #folder-stats, #foldercomment { margin-top:1em; padding-top:0.5em; border-top:1px solid #666;  }
