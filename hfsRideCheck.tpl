@@ -186,15 +186,9 @@ COMMENT skb: no folders! but had to enable moves for trash
 			<button id='commentBtn' onclick='setComment.call(this)'>Comment</button>
 		.}
 
-		{.if|{.get|can delete.}|
-			<button id='trashBtn' onclick='
-				var a = selectedItems();
-				if (a.length < 1) {
-					return alert("You must select at least one file to move to Trash.");
-				}
-				if (confirm("Move selected file(s) to Trash?")) submit({action:"delete"}, "{.get|url.}")'> Delete </button>
+		{.if|{.and|{.!option.move.}|{.can move.}.}| 
+			<button id='moveBtn' onclick='moveToTrash()'> Move to Trash </button> 
 		.}
-		<br>
 
 		{.if|{.get|can archive.}|
 			<button id='archiveBtn' onclick='
@@ -215,7 +209,10 @@ COMMENT skb: no folders! but had to enable moves for trash
 		<legend><img src="/~img9"> {.!Actions.}</legend>
 		<center>
 
-		<button id='restoreBtn'> Restore </button>
+		
+		{.if|{.and|{.!option.move.}|{.can move.}.}| 
+			<button id='restoreBtn' onclick='restoreFromTrash()'> Restore </button>
+		.}
 		
 		{.if|{.get|can delete.}|
 			<button id='delBtn' onclick='
@@ -226,7 +223,7 @@ COMMENT skb: no folders! but had to enable moves for trash
 				if (confirm("Delete selected file(s)?")) submit({action:"delete"}, "{.get|url.}")'> Delete </button>
 		.}
 		<br>
-
+		
 		<a href="{.get|url|tpl=list|sort=|{.if not|{.length|{.?search.}.}|{:folders-filter=\|recursive:}.}.}">(Text Listing)</a>
 		</center>
 	</fieldset>
@@ -278,7 +275,6 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 #files td.nosize { text-align:center; font-style:italic; }
 #files .selector { display:none; }
 #actions button { margin:0.2em; width:120px}
-#xactions button { margin:0.2em; width:120px}
 #breadcrumbs { margin-top:1em; padding-left:0.5em; }
 #breadcrumbs a { padding:0.15em 0; border-width:2px; display:block; word-break:break-all; }
 #folder-stats, #foldercomment { margin-top:1em; padding-top:0.5em; border-top:1px solid #666;  }
@@ -447,6 +443,34 @@ fieldset { margin-bottom:0.7em; text-align:left; padding:0.6em; }
 {.break|if={.not|{.length|{.rename|{.^x.}|{.^y.}.}.}.}|result=failed.}
 {.add to log|User %user% renamed "{.^x.}" to "{.^y.}".}
 {.pipe|ok.}
+
+
+[ajax.move|no log]
+{.check session.}
+{.set|dst|{.force ansi|{.postvar|dst.}.}.}
+{.break|if={.not|{.and|{.can move.}|{.get|can delete.}|{.get|can upload|path={.^dst.}.}/and.}.} |result={.!forbidden.}.}
+{.set|log|{.!Moving items to.} {.^dst.}.}
+{.for each|fn|{.replace|:|{.no pipe||.}|{.force ansi|{.postvar|files.}.}.}|{:
+	{.break|if={.is file protected|var=fn.}|result=forbidden.}
+    {.set|x|{.force ansi|%folder%.}{.^fn.}.}
+    {.set|y|{.^dst.}/{.^fn.}.}
+    {.if not |{.exists|{.^x.}.}|{.^x.}: {.!not found.}|{:
+        {.if|{.exists|{.^y.}.}|{.^y.}: {.!already exists.}|{:
+            {.if|{.length|{.move|{.^x.}|{.^y.}.}.} |{: 
+                {.set|log|{.chr|13.}{.^fn.}|mode=append.}
+                {.move|{.^x.}.md5|{.^y.}.md5.}
+                {.move|{.^x.}.comment|{.^y.}.comment.}
+            :} | {:
+                {.set|log|{.chr|13.}{.^fn.} (failed)|mode=append.}
+                {.maybe utf8|{.^fn.}.}: {.!not moved.}
+            :}/if.}
+        :}/if.}
+    :}.}
+    ;
+:}.}
+{.add to log|{.^log.}|color=clBlue.}
+
+
 [ajax.comment|no log]
 {.check session.}
 {.break|if={.not|{.can comment.}.} |result=forbidden.}
@@ -776,12 +800,17 @@ function getStdAjaxCB(what2do) {
 
 function selectedItems() { return $('#files .selector:checked') }
 
-function selectedFilesAsStr() {
+
+function fileSelListToStr(theFList) {
     var a = [];
-    selectedItems().each(function(){
+    theFList.each(function(){
         a.push(getItemName(this));
     });
     return a.join(":");
+}
+
+function selectedFilesAsStr() {
+	return fileSelListToStr(selectedItems());
 }//selectedFilesAsStr
 
 function setComment() {
@@ -984,6 +1013,71 @@ function doRename() {
 		ajax("rename", {from:getItemName(a[0]), to:s});
 	});
 }//doRename
+
+
+function moveToTrash() {
+	if (selectedItems().length < 1) {
+		return alert("You must select at least one file to Trash.");
+	}
+
+	ajax('move', {dst:"/TRASH", files:selectedFilesAsStr()}, function(res){
+		var a = res.split(";");
+		if (a.length < 2)
+			return alert($.trim(res));
+		var failed = 0;
+		var ok = 0;
+		var msg = "";
+		for (var i=0; i<a.length-1; i++) {
+			var s = $.trim(a[i]);
+			if (!s.length) {
+				ok++;
+				continue;
+			}
+			failed++;
+			msg += s+"\n";
+		}
+		if (failed) 
+			msg = "{.!There were the following problems:.}\n"+msg;
+		msg = (ok ? ok+" {.!files were moved..}\n" : "{.!No file was moved..}\n")+msg;
+		alert(msg);
+		if (ok) location = location; // reload
+	});
+}//moveToTrash
+
+
+function restoreFromTrash() {
+	var selList = selectedItems();
+	var failed = 0;
+	var ok = 0;
+	var msg = "";
+
+	
+	if (selList.length < 1) {
+		return alert("You must select at least one file to Restore.");
+	}
+	ajax('move', {dst:"/TRASH", files:selectedFilesAsStr()}, function(res){
+		var a = res.split(";");
+		if (a.length < 2)
+			return alert($.trim(res));
+		for (var i=0; i<a.length-1; i++) {
+			var s = $.trim(a[i]);
+			if (!s.length) {
+				ok++;
+				continue;
+			}
+			failed++;
+			msg += s+"\n";
+		}
+		if (ok) location = location; // reload
+	});
+
+	if (failed) 
+		msg = "{.!There were the following problems:.}\n"+msg;
+	msg = (ok ? ok+" {.!files were moved..}\n" : "{.!No file was moved..}\n")+msg;
+	alert(msg);
+	if (ok) location = location; // reload
+}//restoreFromTrash
+
 
 function selectionMask() {
     ezprompt('{.!Please enter the file mask to select.}', {'type':'text', 'default':'*'}, function(s){
