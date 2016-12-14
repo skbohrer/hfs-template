@@ -204,7 +204,7 @@ COMMENT skb: no folders! but had to enable moves for trash
 		</center>
 	</fieldset>
 	
-[box xactions]
+[box trash-actions]
 	<fieldset id='actions'>
 		<legend><img src="/~img9"> {.!Actions.}</legend>
 		<center>
@@ -801,16 +801,12 @@ function getStdAjaxCB(what2do) {
 function selectedItems() { return $('#files .selector:checked') }
 
 
-function fileSelListToStr(theFList) {
+function selectedFilesAsStr() {
     var a = [];
-    theFList.each(function(){
+    selectedItems().each(function(){
         a.push(getItemName(this));
     });
     return a.join(":");
-}
-
-function selectedFilesAsStr() {
-	return fileSelListToStr(selectedItems());
 }//selectedFilesAsStr
 
 function setComment() {
@@ -1050,17 +1046,37 @@ function restoreFromTrash() {
 	var failed = 0;
 	var ok = 0;
 	var msg = "";
-
+	var busFileList = "", datFileList = "";
 	
-	if (selList.length < 1) {
-		return alert("You must select at least one file to Restore.");
+	// sort selected files to lists for /BUS and /DAT folders
+	// lists must match format of "selectedFilesAsStr()"
+	function buildFileLists() {
+		var fTag, fName, busL = [], datL = [];
+		
+		selList.each(function(){
+			fName = getItemName(this);
+			fTag = fName.substr(0,4);
+			if (fTag === "DAT_" || fTag === "CSC_") {
+				datL.push(fName);
+			} else {
+				busL.push(fName);
+			}
+		});
+		
+		if (busL.length) {
+			busFileList = busL.join(":");
+		}
+		if (datL.length) {
+			datFileList = datL.join(":");
+		}
 	}
-	ajax('move', {dst:"/TRASH", files:selectedFilesAsStr()}, function(res){
-		var a = res.split(";");
-		if (a.length < 2)
-			return alert($.trim(res));
-		for (var i=0; i<a.length-1; i++) {
-			var s = $.trim(a[i]);
+	
+		// parse results of a file move
+	function processResults(a) {
+		var i, s;
+		
+		for (i=0; i<a.length-1; i++) {
+			s = $.trim(a[i]);
 			if (!s.length) {
 				ok++;
 				continue;
@@ -1068,14 +1084,56 @@ function restoreFromTrash() {
 			failed++;
 			msg += s+"\n";
 		}
+	}
+	
+		// show results of file move(s)
+	function showMoveAlert() {
+		if (failed) 
+			msg = "{.!There were the following problems:.}\n"+msg;
+		msg = (ok ? ok+" {.!files were moved..}\n" : "{.!No file was moved..}\n")+msg;
+		alert(msg);
 		if (ok) location = location; // reload
-	});
-
-	if (failed) 
-		msg = "{.!There were the following problems:.}\n"+msg;
-	msg = (ok ? ok+" {.!files were moved..}\n" : "{.!No file was moved..}\n")+msg;
-	alert(msg);
-	if (ok) location = location; // reload
+	}
+	
+		// move any data files and then show results
+	function doDatMove() {
+		if (datFileList) {
+			ajax('move', {dst:"/DAT", files:datFileList}, function(res){
+				var a = res.split(";");
+				if (a.length < 2) {
+					msg += "Moves to folder /DAT : " + $.trim(res) + "\n";
+					failed += 1;
+				} else {
+					processResults(a);
+				}
+				showMoveAlert();
+			});
+		} else if (ok || failed) {
+			showMoveAlert();
+		}
+	}
+	
+		// main function code start
+	if (selList.length < 1) {
+		return alert("You must select at least one file to Restore.");
+	}
+	
+	buildFileLists();
+	
+	if (busFileList) {		// move BUS_ and SCS_ files, if any
+		ajax('move', {dst:"/BUS", files:busFileList}, function(res){
+			var a = res.split(";");
+			if (a.length < 2) {
+				msg += "Moves to folder /BUS : " + $.trim(res) + "\n";
+				failed += 1;
+			} else {
+				processResults(a);
+			}
+			setTimeout(doDatMove, 10);
+		});
+	} else {	// no BUS_ files, so just move any DAT_ and CSC_ files
+		doDatMove();
+	}
 }//restoreFromTrash
 
 
