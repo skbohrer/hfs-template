@@ -1015,6 +1015,10 @@ function moveToTrash() {
 	if (selectedItems().length < 1) {
 		return alert("You must select at least one file to Trash.");
 	}
+	
+	if (!confirm("Move selected file(s) to Trash?")) {
+		return 0;
+	}
 
 	ajax('move', {dst:"/TRASH", files:selectedFilesAsStr()}, function(res){
 		var a = res.split(";");
